@@ -1,0 +1,6 @@
+colour==0.1.5
+pandas==1.0.1
+requests==2.22.0
+git+https://github.com/Rapptz/discord.py
+nekos.py==1.0.3
+BeautifulSoup4==4.8.0
