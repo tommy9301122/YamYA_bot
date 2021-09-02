@@ -1,4 +1,4 @@
-## 呱YA一號 | [Invite](https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot)
+## 呱YA一號 [![](https://img.shields.io/badge/discord%20bot-invite-blue?style=for-the-badge&logo=discord)](https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot)  
 是個喜歡認識osu麻婆、看動畫、亂道早安晚安的discord機器人  
 
 -----------
