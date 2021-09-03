@@ -74,7 +74,7 @@ async def on_message(message):
     
     ####################################################### 代替呱YA講話
     if message.content.lower().startswith('呱ya說 '):
-        repeat_mes = message.content.split("呱ya說 ",1)[1]
+        repeat_mes = message.content.lower().split("呱ya說 ",1)[1]
         
         if int(message.author.id)==378936265657286659 or int(message.author.id)==86721800393740288:
             await message.delete()
