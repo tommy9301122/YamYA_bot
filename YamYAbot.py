@@ -48,6 +48,11 @@ def parse_date(td):
 async def on_ready():
     print('目前登入身份：', client.user)
     
+    guilds = client.guilds
+    print('Server:')
+    for guild in guilds:
+        print(guild.name)
+    
     status_w = discord.Status.online  #Status : online（上線）,offline（下線）,idle（閒置）,dnd（請勿打擾）,invisible（隱身）
     activity_w = discord.Activity(type=discord.ActivityType.playing, name="YamYA我把拔")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
 
