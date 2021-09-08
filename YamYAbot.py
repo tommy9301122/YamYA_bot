@@ -354,7 +354,7 @@ async def on_message(message):
         
         recommend_combo_color = ''
         
-        color_hex = '{:02x}{:02x}{:02x}'.format(round(codes[0][0]), round(codes[0][1]), round(codes[0][2]))
+        color_hex = '{:02x}{:02x}{:02x}'.format(int(round(codes[0][0])), int(round(codes[0][1])), int(round(codes[0][2])))
         sixteenIntegerHex = int(color_hex, 16)
         readableHex = int(hex(sixteenIntegerHex), 0)
         
