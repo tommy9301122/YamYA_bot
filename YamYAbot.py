@@ -2,12 +2,16 @@ from PTT_jokes import PttJokes
 from bot_data import food_a, food_j, food_c, YamYABot_murmur
 
 from colour import Color
+from PIL import Image
+import scipy
+import scipy.cluster
 import os
 import datetime
 from datetime import date
 import re
 import random
 import requests
+import numpy as np
 import pandas as pd
 import discord
 import nekos
@@ -127,34 +131,34 @@ async def on_message(message):
         embed.set_image(url=nekos.img('cuddle'))
         await message.channel.send(embed=embed)
         
-    if message.content=='抱抱' :
+    if message.content=='抱抱' or message.content=='hug' :
         embed=discord.Embed(title="(つ´ω`)つ")
         embed.set_image(url=nekos.img('hug'))
         await message.channel.send(embed=embed)
         
         
-    if message.content=='親親' :
+    if message.content=='親親' or message.content=='kiss' :
         embed=discord.Embed(title="( ˘ ³˘)♥")
         embed.set_image(url=nekos.img('kiss'))
         await message.channel.send(embed=embed)
         
-    if message.content=='喵' :
+    if message.content=='喵' or message.content=='nya' :
         embed=discord.Embed(title="喵? ο(=•ω＜=)ρ⌒☆")
         embed.set_image(url=nekos.img('ngif'))
         await message.channel.send(embed=embed)
         
-    if message.content=='戳' :
+    if message.content=='戳' or message.content=='poke' :
         embed=discord.Embed(title="戳~")
         embed.set_image(url=nekos.img('poke'))
         await message.channel.send(embed=embed)
         
         
-    if message.content=='笨蛋' :
+    if message.content=='笨蛋' or message.content=='baka' :
         embed=discord.Embed(title="バカ")
         embed.set_image(url=nekos.img('baka'))
         await message.channel.send(embed=embed)
 
-    bad_word_list = ['幹','靠北','幹你娘','fuck you 呱ya','fuck 呱ya']
+    bad_word_list = ['幹','靠北','幹你娘','fuck you 呱ya','fuck 呱ya','fuck']
     if message.content.lower() in bad_word_list:
         await message.channel.send(nekos.img('slap'))            
                 
@@ -332,6 +336,40 @@ async def on_message(message):
             await message.channel.send('我找不到這張圖;w;')
             
             
+    ######################################################## 根據BG推薦 combo color       
+    if message.content.startswith('combo color '):
+
+        beatmap_url = message.content.split("combo color ",1)[1]
+        beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
+        color_num = 6
+        
+        img_url = 'https://b.ppy.sh/thumb/'+str(beatmap_id)+'l.jpg'
+        im = Image.open(requests.get(img_url, stream=True).raw)
+        #im = im.resize((150, 150))      # optional, to reduce time
+        ar = np.asarray(im)
+        shape = ar.shape
+        ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+        codes, dist = scipy.cluster.vq.kmeans(ar, color_num)
+        
+        
+        recommend_combo_color = ''
+        
+        color_hex = '{:02x}{:02x}{:02x}'.format(round(codes[0][0]), round(codes[0][1]), round(codes[0][2]))
+        sixteenIntegerHex = int(color_hex, 16)
+        readableHex = int(hex(sixteenIntegerHex), 0)
+        
+        num_int = 1
+        for i in codes:
+            rgb_str = str((round(i[0]), round(i[1]), round(i[2])))
+            recommend_combo_color = recommend_combo_color+str(num_int)+'. '+rgb_str+'\n'
+            num_int+=1
+            
+        embed=discord.Embed(description=recommend_combo_color, color=readableHex)
+        embed.set_author(name='Combo Color Recommend', icon_url='https://raster.shields.io/badge/--'+color_hex+'.png')
+        embed.set_thumbnail(url=img_url)
+        await message.channel.send(embed=embed)
+            
+            
     ################################################################ 隨機喊婆
     if message.content.startswith('全婆俠 '):
         
@@ -397,7 +435,6 @@ async def on_message(message):
         await message.channel.send(embed=embed)
         
         
-    
     ################################################################ 取得 AniList 其中一首歌曲
     if message.content.startswith('AMQ '):
         
