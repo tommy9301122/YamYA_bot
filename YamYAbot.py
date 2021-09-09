@@ -26,7 +26,7 @@ def googlemaps_search_food(search_food, search_place):
     location_info = gmaps.geocode(search_place)
     location_lat = location_info[0].get('geometry').get('location').get('lat')
     location_lng = location_info[0].get('geometry').get('location').get('lng')
-    search_place_r = gmaps.places_nearby(keyword=search_food, location=str(location_lat)+', '+str(location_lng), language='zh-TW', radius=3000)
+    search_place_r = gmaps.places_nearby(keyword=search_food, location=str(location_lat)+', '+str(location_lng), language='zh-TW', radius=1000)
     name_list = []
     place_id_list = []
     rating_list = []
