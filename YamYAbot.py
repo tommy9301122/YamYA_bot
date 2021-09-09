@@ -15,7 +15,33 @@ import numpy as np
 import pandas as pd
 import discord
 import nekos
+import googlemaps
 client = discord.Client()
+
+Google_Map_API_key = os.environ.get('Google_Map_API_key')
+
+# Google map推薦餐廳
+def googlemaps_search_food(search_food, search_place):
+    gmaps = googlemaps.Client(key=Google_Map_API_key)
+    location_info = gmaps.geocode(search_place)
+    location_lat = location_info[0].get('geometry').get('location').get('lat')
+    location_lng = location_info[0].get('geometry').get('location').get('lng')
+    search_place_r = gmaps.places_nearby(keyword=search_food, location=str(location_lat)+', '+str(location_lng), language='zh-TW', radius=3000)
+    name_list = []
+    place_id_list = []
+    rating_list = []
+    user_ratings_total_list = []
+    for i in search_place_r.get('results'):
+        name_list.append(i.get('name'))
+        place_id_list.append(i.get('place_id'))
+        rating_list.append(i.get('rating'))
+        user_ratings_total_list.append(i.get('user_ratings_total'))
+    df_result = pd.DataFrame({'name':name_list, 'place_id':place_id_list, 'rating':rating_list, 'user_ratings_total':user_ratings_total_list})
+    try:
+        df_result = df_result.loc[df_result.rating>4].sample()
+    except:
+        df_result = df_result.sample()
+    return df_result.name.values[0], df_result.place_id.values[0], df_result.rating.values[0], df_result.user_ratings_total.values[0]
 
 # 顏色判斷用
 def get_rating_color(beatmap_rating):
@@ -126,7 +152,7 @@ async def on_message(message):
         
     
     ###################################################### 其他彩蛋
-    if message.content=='貼貼' :
+    if message.content=='貼貼' or message.content=='cuddle' :
         embed=discord.Embed(title="ლ(╹◡╹ლ)")
         embed.set_image(url=nekos.img('cuddle'))
         await message.channel.send(embed=embed)
@@ -179,25 +205,76 @@ async def on_message(message):
                 await message.channel.send(random.choice(food_c)+random.choice(ending_list))
             if eat_class == 2:
                 await message.channel.send(random.choice(food_j+food_a)+random.choice(ending_list))
-
-
+                
+    # 有選類別:
     if message.content.startswith('午餐吃什麼 ') or message.content.startswith('晚餐吃什麼 ') :
+        comm = message.content.split(' ')
 
-        food_class = message.content.split("吃什麼 ",1)[1]
+        # 只輸入類別
+        if len(comm)==2 and '式' in comm[1]:
+            food_class = comm[1]
 
-        if food_class=='中式' or food_class=='台式':
-            await message.channel.send(random.choice(food_c)+random.choice(ending_list))
-        elif food_class=='日式' :
-            await message.channel.send(random.choice(food_j)+random.choice(ending_list))
-        elif food_class=='美式' :
-            await message.channel.send(random.choice(food_a)+random.choice(ending_list))
-        else:
-            await message.channel.send('º﹃º')
+            if food_class=='中式' or food_class=='台式':
+                await message.channel.send(random.choice(food_c)+random.choice(ending_list))
+            elif food_class=='日式' :
+                await message.channel.send(random.choice(food_j)+random.choice(ending_list))
+            elif food_class=='美式' :
+                await message.channel.send(random.choice(food_a)+random.choice(ending_list))
+            else:
+                pass
+
+        # 只輸入地點
+        if len(comm)==2 and '式' not in comm[1]:
+            search_food = random.choice(food_j+food_a+food_c)
+            search_place = comm[1]
+            try:
+                restaurant = googlemaps_search_food(search_food, search_place)
+                
+                embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                embed.set_author(name = search_food+random.choice(ending_list))
+                await message.channel.send(embed=embed)
+            except:
+                pass
+            
+        # 輸入類別和地點
+        if len(comm)==3 and '式' in comm[1]:
+            food_class = comm[1]
+            search_place = comm[2]
+
+            if food_class=='中式' or food_class=='台式':
+                search_food = random.choice(food_c)
+                try:
+                    restaurant = googlemaps_search_food(search_food, search_place)
+                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                    embed.set_author(name = search_food+random.choice(ending_list))
+                    await message.channel.send(embed=embed)
+                except:
+                    pass
+
+            elif food_class=='日式' :
+                search_food = random.choice(food_j)
+                try:
+                    restaurant = googlemaps_search_food(search_food, search_place)
+                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                    embed.set_author(name = search_food+random.choice(ending_list))
+                    await message.channel.send(embed=embed)
+                except:
+                    pass
+
+            elif food_class=='美式' :
+                search_food = random.choice(food_a)
+                try:
+                    restaurant = googlemaps_search_food(search_food, search_place)
+                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                    embed.set_author(name = search_food+random.choice(ending_list))
+                    await message.channel.send(embed=embed)
+                except:
+                    pass
+            else:
+                await message.channel.send('格式好像錯了 º﹃º')
             
 
-
-
-    ####################################################### 推薦麻婆最新上傳的圖    
+    ####################################################### 神麻婆卡片    
     if message.content.startswith('神麻婆'):
         try:
             mapper = message.content.split("神麻婆",1)[1]
@@ -495,7 +572,8 @@ async def on_message(message):
                 if len(animethemes.get('anime'))==0:
                     animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/'+saerch_name[1]).json()
                 
-                ######## 科南回歸用:
+                ######## 
+                # 柯南回歸用:
                 if 'Meitantei Conan' in saerch_name[0]:
                     animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/Meitantei Conan').json()
                     saerch_name = ['Meitantei Conan','Detective Conan']
