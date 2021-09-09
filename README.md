@@ -6,6 +6,7 @@
 #### 🍠osu!相關:
 ```神麻婆 [mapper's osu!帳號]``` - 自動計算mapper的各項遊戲數據並呈現在embed上  
 ```icon bbcode [圖譜網址]``` - 新版漸層色難度icon的BBCode，可以用於description  
+```combo color [圖譜網址] ``` - 依據背景圖推薦六個combo color
 
 #### 🍠二次元相關:
 ```全婆俠 [AniList帳號]``` - 從你看過的作品中隨機選角喊婆  
