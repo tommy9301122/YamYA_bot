@@ -102,6 +102,9 @@ async def on_message(message):
     if message.content.lower() == 'gn':
         await message.channel.send('gn (¦3[▓▓]')
         
+    if message.content.lower() == "owo":
+        await message.channel.send(f"owo, {message.author.name}")
+        
     ####################################################### 呱YA murmur
     if message.content.lower() == '呱ya':
         await message.channel.send(random.choice(YamYABot_murmur))
