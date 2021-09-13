@@ -30,7 +30,7 @@
 * [Google Maps](https://github.com/googlemaps/google-maps-services-python)
 
 ### TODO
-- [ ] 指令翻譯(godmapper、waifu) 
+- [ ] 指令翻譯
 - [ ] 英文版README
 - [ ] 指令使用範例
 - [ ] google map 餐廳推薦
