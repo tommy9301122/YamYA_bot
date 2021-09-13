@@ -233,7 +233,7 @@ async def on_message(message):
             try:
                 restaurant = googlemaps_search_food(search_food, search_place)
                 
-                embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
                 embed.set_author(name = search_food+random.choice(ending_list))
                 await message.channel.send(embed=embed)
             except:
@@ -248,7 +248,7 @@ async def on_message(message):
                 search_food = random.choice(food_c)
                 try:
                     restaurant = googlemaps_search_food(search_food, search_place)
-                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
                     embed.set_author(name = search_food+random.choice(ending_list))
                     await message.channel.send(embed=embed)
                 except:
@@ -258,7 +258,7 @@ async def on_message(message):
                 search_food = random.choice(food_j)
                 try:
                     restaurant = googlemaps_search_food(search_food, search_place)
-                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
                     embed.set_author(name = search_food+random.choice(ending_list))
                     await message.channel.send(embed=embed)
                 except:
@@ -268,7 +268,7 @@ async def on_message(message):
                 search_food = random.choice(food_a)
                 try:
                     restaurant = googlemaps_search_food(search_food, search_place)
-                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/place/?q=place_id:'+restaurant[1])
+                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
                     embed.set_author(name = search_food+random.choice(ending_list))
                     await message.channel.send(embed=embed)
                 except:
