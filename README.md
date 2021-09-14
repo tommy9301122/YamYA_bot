@@ -1,5 +1,5 @@
 ## 呱YA一號 [![](https://img.shields.io/badge/discord%20bot-invite-blue?style=for-the-badge&logo=discord)](https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot)  
-a discord bot for osu mapper and otaku
+a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tommy9301122/YamYA_bot/blob/main/README_zh.md)
 
 -----------
 ### Command
