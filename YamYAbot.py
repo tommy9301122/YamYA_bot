@@ -19,6 +19,7 @@ import googlemaps
 client = discord.Client()
 
 Google_Map_API_key = os.environ.get('Google_Map_API_key')
+Discord_token = os.environ.get('BOT_TOKEN')
 
 # Google map推薦餐廳
 def googlemaps_search_food(search_food, search_place):
@@ -96,7 +97,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    ###################################################### 早安、晚安
+    ###################################################### 早安、晚安、owo、呱YA murmur
     if message.content.lower() == 'gm':
         await message.channel.send('gm (｡･∀･)ﾉﾞ')
     if message.content.lower() == 'gn':
@@ -105,7 +106,6 @@ async def on_message(message):
     if message.content.lower() == "owo":
         await message.channel.send(f"owo, {message.author.name}")
         
-    ####################################################### 呱YA murmur
     if message.content.lower() == '呱ya':
         await message.channel.send(random.choice(YamYABot_murmur))
         
@@ -117,6 +117,7 @@ async def on_message(message):
         if int(message.author.id)==378936265657286659 or int(message.author.id)==86721800393740288:
             await message.delete()
             await message.channel.send(repeat_mes)
+            
     
     ###################################################### 訊息中包含 azgod (不分大小寫)
     str_az = re.search(r'[a-zA-Z]{5}', message.content)
@@ -151,7 +152,6 @@ async def on_message(message):
         embed = discord.Embed(title=joke_title, description=joke_main)
         embed.set_footer(text=joke_foot)
         await message.channel.send(embed=embed)
-    
         
     
     ###################################################### 其他彩蛋
@@ -164,7 +164,6 @@ async def on_message(message):
         embed=discord.Embed(title="(つ´ω`)つ")
         embed.set_image(url=nekos.img('hug'))
         await message.channel.send(embed=embed)
-        
         
     if message.content=='親親' or message.content=='kiss' :
         embed=discord.Embed(title="( ˘ ³˘)♥")
@@ -180,7 +179,6 @@ async def on_message(message):
         embed=discord.Embed(title="戳~")
         embed.set_image(url=nekos.img('poke'))
         await message.channel.send(embed=embed)
-        
         
     if message.content=='笨蛋' or message.content=='baka' :
         embed=discord.Embed(title="バカ")
@@ -278,11 +276,12 @@ async def on_message(message):
             
 
     ####################################################### 神麻婆卡片    
-    if message.content.startswith('神麻婆'):
+    if message.content.startswith('神麻婆 ') or message.content.startswith('god mapper '):
         try:
-            mapper = message.content.split("神麻婆",1)[1]
-            if mapper[0] == ' ':
-                mapper = mapper[1:]
+            try:
+                mapper = message.content.split('神麻婆 ',1)[1]
+            except:
+                mapper = message.content.split('god mapper ',1)[1]
                 
             get_beatmaps = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper).json()
             beatmaps = {}
@@ -291,7 +290,6 @@ async def on_message(message):
                 beatmaps[num] = i
                 num = num+1
             df_beatmaps  = pd.DataFrame.from_dict(beatmaps, "index")
-            
             
             if df_beatmaps.head(1).creator_id.values[0] == '0':
                 await message.channel.send('我找不到這位神麻婆的圖;w;')
@@ -451,9 +449,12 @@ async def on_message(message):
             
             
     ################################################################ 隨機喊婆
-    if message.content.startswith('全婆俠 '):
+    if message.content.startswith('全婆俠 ') or message.content.startswith('waifu '):
         
-        AniList_userName = message.content.split("全婆俠 ",1)[1]
+        try:
+            AniList_userName = message.content.split("全婆俠 ",1)[1]
+        except:
+            AniList_userName = message.content.split("waifu ",1)[1]
 
         # 取得 AniList
         query = '''
@@ -599,5 +600,4 @@ async def on_message(message):
                 #print(saerch_name)
                 pass
 
-token = os.environ.get('BOT_TOKEN')
-client.run(token)
+client.run(Discord_token)
