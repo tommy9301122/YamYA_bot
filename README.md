@@ -28,9 +28,3 @@
 * [AnimeThemes](https://github.com/LetrixZ/animethemes-api) - 動畫OP/ED來源  
 * [nekos](https://github.com/Nekos-life/nekos.py) - gif檔來源  
 * [Google Maps](https://github.com/googlemaps/google-maps-services-python)
-
-### TODO
-- [ ] 指令翻譯
-- [ ] 英文版README
-- [ ] 指令使用範例
-- [ ] google map 餐廳推薦
