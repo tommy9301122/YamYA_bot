@@ -11,7 +11,7 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 #### 🍠ACG:
 ```waifu/husbando [AniList account]``` - say random charactor is waifu/husbando from your complete list  
 ```AMQ [AniList account]``` - play random OP/ED video from your complete/watching list  
-```cuddle/hug/kiss/nya/poke/baka/fuck``` - random gif  
+```cuddle/hug/kiss//nya/poke/baka/fuck``` - random gif  
 
 #### 🍠Others:
 ```午餐吃什麼 [中式/台式/日式/美式] [地區]``` - decide what to eat  
