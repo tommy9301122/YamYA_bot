@@ -9,7 +9,7 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```combo color [beatmap url] ``` - recommend six combo colors based on the background image  
 
 #### 🍠ACG:
-```waifu [AniList account]``` - say random charactor is waifu from your complete list  
+```waifu/husbando [AniList account]``` - say random charactor is waifu/husbando from your complete list  
 ```AMQ [AniList account]``` - play random OP/ED video from your complete/watching list  
 ```cuddle/hug/kiss/nya/poke/baka/fuck``` - random gif  
 
