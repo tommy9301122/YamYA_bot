@@ -72,6 +72,50 @@ def parse_date(td):
     resYear = int(resYear)
     resDay = int(td.days-(364*resYear+30*resMonth))
     return str(resYear) + " years " + str(resMonth) + " months and " + str(resDay) + " days."
+    
+# 取得AniList隨機角色
+def get_AniList_character(AniList_userName, character_gender_input):
+    query = '''
+    query ($userName: String, $MediaListStatus: MediaListStatus, $page: Int, $perPage: Int) {
+        Page (page: $page, perPage: $perPage) {
+            pageInfo {hasNextPage}
+            mediaList (userName: $userName, status: $MediaListStatus) {
+                media {title{romaji}
+                       characters{nodes{name{full native} gender image{medium}}}
+                  }
+            }
+        }
+    }
+    '''
+    page_number = 1
+    next_page = True
+    
+    character_list = []
+    character_image_list = []
+    character_gender_list = []
+    anine_title_list = []
+    while next_page is True:
+        variables = {'userName': AniList_userName, 'MediaListStatus': 'COMPLETED', 'page': page_number, 'perPage': 50 }
+        response = requests.post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
+        next_page = response.get('data').get('Page').get('pageInfo').get('hasNextPage')
+        for anime in response.get('data').get('Page').get('mediaList'):
+            characters = anime.get('media').get('characters').get('nodes')
+            for character in characters:
+                #character_name = character.get('name').get('full')
+                character_native = character.get('name').get('native')
+                character_image = character.get('image').get('medium')
+                character_gender = character.get('gender')
+                if (character_native!=None) and (character_image!=None) and (character_gender!=None):
+                    character_list.append(character_native)
+                    character_image_list.append(character_image)
+                    character_gender_list.append(character_gender)
+        page_number += 1
+    df_all_character = pd.DataFrame({'character':character_list, 'image':character_image_list, 'gender':character_gender_list})
+    df_character = df_all_character.drop_duplicates().loc[df_all_character.gender==character_gender_input].sample()
+    character_name = df_character.character.values[0]
+    character_image = df_character.image.values[0]
+    
+    return character_name, character_image
 
 
 #當機器人完成啟動時
@@ -168,6 +212,11 @@ async def on_message(message):
     if message.content=='親親' or message.content=='kiss' :
         embed=discord.Embed(title="( ˘ ³˘)♥")
         embed.set_image(url=nekos.img('kiss'))
+        await message.channel.send(embed=embed)
+        
+    if message.content=='餵我' or message.content=='feed me' :
+        embed=discord.Embed(title="ψ(｀∇´)ψ")
+        embed.set_image(url=nekos.img('feed'))
         await message.channel.send(embed=embed)
         
     if message.content=='喵' or message.content=='nya' :
@@ -449,70 +498,40 @@ async def on_message(message):
             
             
     ################################################################ 隨機喊婆
-    if message.content.startswith('全婆俠 ') or message.content.startswith('waifu '):
+    if message.content.startswith('全婆俠 ') :
+        AniList_userName = message.content.split("全婆俠 ",1)[1]
+        character_gender_input = random.choice(['Female','Male'])
         
-        try:
-            AniList_userName = message.content.split("全婆俠 ",1)[1]
-        except:
-            AniList_userName = message.content.split("waifu ",1)[1]
-
-        # 取得 AniList
-        query = '''
-        query ($userName: String, $MediaListStatus: MediaListStatus, $page: Int, $perPage: Int) {
-            Page (page: $page, perPage: $perPage) {
-                pageInfo {hasNextPage}
-                mediaList (userName: $userName, status: $MediaListStatus) {
-                    media {title{romaji english native}
-                           characters{nodes{name{full native} gender image{medium}}}
-                      }
-                }
-            }
-        }
-        '''
-        page_number = 1
-        next_page = True
-
-        character_list = []
-        character_image_list = []
-        character_gender_list = []
-
-        while next_page is True:
-            variables = {'userName': AniList_userName, 'MediaListStatus': 'COMPLETED', 'page': page_number, 'perPage': 50 }
-            response = requests.post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
-            next_page = response.get('data').get('Page').get('pageInfo').get('hasNextPage')
-
-            for anime in response.get('data').get('Page').get('mediaList'):
-                #romaji_title = anime.get('media').get('title').get('romaji')
-                #english_title = anime.get('media').get('title').get('english')
-                #native_title = anime.get('media').get('title').get('native')
-                characters = anime.get('media').get('characters').get('nodes')
-
-                for character in characters:
-                    #character_name = character.get('name').get('full')
-                    character_native = character.get('name').get('native')
-                    character_image = character.get('image').get('medium')
-                    character_gender = character.get('gender')
-
-                    if (character_native!=None) and (character_image!=None) and (character_gender!=None):
-                        character_list.append(character_native)
-                        character_image_list.append(character_image)
-                        character_gender_list.append(character_gender)
-                        
-            page_number += 1
-            #if page_number>=3:
-            #    break
-
-
-        random_character = list(zip(character_list, character_gender_list, character_image_list))[random.randint(0,len(character_list))]
-
-        if random_character[1] == 'Male':
+        random_character = get_AniList_character(AniList_userName, character_gender_input)
+        
+        if character_gender_input == 'Male':
             wifu_gender = '老公'
         else:
             wifu_gender = '婆'
-            
-            
         embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我'+wifu_gender, color=0x7875ff)
-        embed.set_image(url=random_character[2])
+        embed.set_image(url=random_character[1])
+        await message.channel.send(embed=embed)
+    
+    
+    if message.content.startswith('waifu ') :
+        AniList_userName = message.content.split("waifu ",1)[1]
+        character_gender_input = 'Female'
+        
+        random_character = get_AniList_character(AniList_userName, character_gender_input)
+        
+        embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我婆', color=0x7875ff)
+        embed.set_image(url=random_character[1])
+        await message.channel.send(embed=embed)
+        
+
+    if message.content.startswith('husbando ') :
+        AniList_userName = message.content.split("husbando ",1)[1]
+        character_gender_input = 'Male'
+        
+        random_character = get_AniList_character(AniList_userName, character_gender_input)
+        
+        embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我老公', color=0x7875ff)
+        embed.set_image(url=random_character[1])
         await message.channel.send(embed=embed)
         
         
