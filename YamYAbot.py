@@ -1,6 +1,9 @@
 from PTT_jokes import PttJokes
 from bot_data import food_a, food_j, food_c, YamYABot_murmur
 
+from snownlp import SnowNLP
+import jieba
+jieba.set_dictionary('dict_cn.txt')
 from colour import Color
 from PIL import Image
 import scipy
@@ -17,6 +20,7 @@ import discord
 import nekos
 import googlemaps
 client = discord.Client()
+
 
 Google_Map_API_key = os.environ.get('Google_Map_API_key')
 Discord_token = os.environ.get('BOT_TOKEN')
@@ -161,6 +165,27 @@ async def on_message(message):
         if int(message.author.id)==378936265657286659 or int(message.author.id)==86721800393740288:
             await message.delete()
             await message.channel.send(repeat_mes)
+            
+            
+    ####################################################### 回答一句話
+    if message.content.lower().startswith('呱ya '):
+        input_text = message.content.lower().split("呱ya ",1)[1]
+        
+        df_QA = pd.read_csv('https://storage.googleapis.com/ad_copy/df_QA.csv')
+        all_cut_list = df_QA.question_cut.to_list()
+        all_cut_list = [str(i).split() for i in all_cut_list]
+        all_answer_list = df_QA.answer.to_list()
+
+        # BM25
+        s_ad_text = SnowNLP(all_cut_list)
+        BM25 = s_ad_text.sim([word for word in jieba.cut(input_text, cut_all=False)])
+
+        df_output = pd.DataFrame()
+        df_output['Priority'] = BM25
+        df_output['Answer'] = all_answer_list
+        df_output = df_output.sort_values(by='Priority', ascending=False)
+        output_ans = df_output.head(1).Answer.values[0]
+        await message.channel.send(output_ans)
             
     
     ###################################################### 訊息中包含 azgod (不分大小寫)
