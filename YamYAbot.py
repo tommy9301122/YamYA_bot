@@ -1,9 +1,6 @@
 from PTT_jokes import PttJokes
 from bot_data import food_a, food_j, food_c, YamYABot_murmur
 
-from snownlp import SnowNLP
-import jieba
-jieba.set_dictionary('dict_cn.txt')
 from colour import Color
 from PIL import Image
 import scipy
@@ -170,21 +167,8 @@ async def on_message(message):
     ####################################################### 回答一句話
     if message.content.lower().startswith('呱ya '):
         input_text = message.content.lower().split("呱ya ",1)[1]
+        output_ans = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
         
-        df_QA = pd.read_csv('https://storage.googleapis.com/ad_copy/df_QA.csv')
-        all_cut_list = df_QA.question_cut.to_list()
-        all_cut_list = [str(i).split() for i in all_cut_list]
-        all_answer_list = df_QA.answer.to_list()
-
-        # BM25
-        s_ad_text = SnowNLP(all_cut_list)
-        BM25 = s_ad_text.sim([word for word in jieba.cut(input_text, cut_all=False)])
-
-        df_output = pd.DataFrame()
-        df_output['Priority'] = BM25
-        df_output['Answer'] = all_answer_list
-        df_output = df_output.sort_values(by='Priority', ascending=False)
-        output_ans = df_output.head(1).Answer.values[0]
         await message.channel.send(output_ans)
             
     
