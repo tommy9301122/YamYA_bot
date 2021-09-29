@@ -13,14 +13,21 @@ import random
 import requests
 import numpy as np
 import pandas as pd
-import discord
 import nekos
 import googlemaps
-client = discord.Client()
 
+import discord
+from discord.ext import commands
+from discord.ext.commands import CommandNotFound
+import time
+import asyncio
 
 Google_Map_API_key = os.environ.get('Google_Map_API_key')
 Discord_token = os.environ.get('BOT_TOKEN')
+
+
+bot = commands.Bot(command_prefix='')
+
 
 # Google map推薦餐廳
 def googlemaps_search_food(search_food, search_place):
@@ -119,12 +126,13 @@ def get_AniList_character(AniList_userName, character_gender_input):
     return character_name, character_image
 
 
-#當機器人完成啟動時
-@client.event
+
+# 啟動
+@bot.event
 async def on_ready():
-    print('目前登入身份：', client.user)
+    print('目前登入身份：', bot.user)
     
-    guilds = client.guilds
+    guilds = bot.guilds
     print('Server:')
     for guild in guilds:
         print(guild.name)
@@ -132,19 +140,42 @@ async def on_ready():
     status_w = discord.Status.online  #Status : online（上線）,offline（下線）,idle（閒置）,dnd（請勿打擾）,invisible（隱身）
     activity_w = discord.Activity(type=discord.ActivityType.playing, name="YamYA我把拔")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
 
-    await client.change_presence(status= status_w, activity=activity_w)
+    await bot.change_presence(status= status_w, activity=activity_w)
     
     
-#當有訊息時
-@client.event
+# 和呱YA聊天
+@bot.command()
+async def 呱YA(ctx, input_text):
+    resp = [None]
+    def get():
+        resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
+    asyncio.get_event_loop().run_in_executor(None, get)
+    while not resp[0]:
+        await asyncio.sleep(0.5)
+    await ctx.send(resp[0])
+
+
+# 忽略指令錯誤error
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        return
+    if isinstance(error, commands.MissingRequiredArgument):
+        return
+    raise error
+    
+
+# on_message
+@bot.event
 async def on_message(message):
     #排除自己的訊息，避免陷入無限循環
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     
     ###################################################### 早安、晚安、owo、呱YA murmur
     if message.content.lower() == 'gm':
         await message.channel.send('gm (｡･∀･)ﾉﾞ')
+        
     if message.content.lower() == 'gn':
         await message.channel.send('gn (¦3[▓▓]')
         
@@ -162,14 +193,6 @@ async def on_message(message):
         if int(message.author.id)==378936265657286659 or int(message.author.id)==86721800393740288:
             await message.delete()
             await message.channel.send(repeat_mes)
-            
-            
-    ####################################################### 回答一句話
-    if message.content.lower().startswith('呱ya '):
-        input_text = message.content.lower().split("呱ya ",1)[1]
-        output_ans = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
-        
-        await message.channel.send(output_ans)
             
     
     ###################################################### 訊息中包含 azgod (不分大小寫)
@@ -627,5 +650,7 @@ async def on_message(message):
             except:
                 #print(saerch_name)
                 pass
-
-client.run(Discord_token)
+            
+    await bot.process_commands(message)
+    
+bot.run(Discord_token)
