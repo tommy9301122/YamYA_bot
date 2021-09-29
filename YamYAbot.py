@@ -194,19 +194,6 @@ async def on_message(message):
             await message.delete()
             await message.channel.send(repeat_mes)
             
-<<<<<<< HEAD
-=======
-            
-    ####################################################### 回答一句話 (待優化)
-    
-    #if message.content.lower().startswith('呱ya '):
-    #    input_text = message.content.lower().split("呱ya ",1)[1]
-    #    output_ans = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
-    #    
-    #    await message.channel.send(output_ans)
-    
-            
->>>>>>> ff0a41c632ec13d8bd5032d981cc3681dba654f5
     
     ###################################################### 訊息中包含 azgod (不分大小寫)
     str_az = re.search(r'[a-zA-Z]{5}', message.content)
