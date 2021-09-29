@@ -29,3 +29,4 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 * [AnimeThemes](https://github.com/LetrixZ/animethemes-api)  
 * [nekos](https://github.com/Nekos-life/nekos.py)  
 * [Google Maps](https://github.com/googlemaps/google-maps-services-python)  
+* [Gossiping-Chinese-Corpus](https://github.com/zake7749/Gossiping-Chinese-Corpus) 

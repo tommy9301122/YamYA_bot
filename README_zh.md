@@ -30,3 +30,4 @@
 * [AnimeThemes](https://github.com/LetrixZ/animethemes-api) - 動畫OP/ED來源  
 * [nekos](https://github.com/Nekos-life/nekos.py) - gif檔來源  
 * [Google Maps](https://github.com/googlemaps/google-maps-services-python)
+* [PTT 八卦版問答中文語料](https://github.com/zake7749/Gossiping-Chinese-Corpus) - 問答功能語料來源
