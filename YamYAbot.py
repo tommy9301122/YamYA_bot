@@ -25,8 +25,9 @@ import asyncio
 Google_Map_API_key = os.environ.get('Google_Map_API_key')
 Discord_token = os.environ.get('BOT_TOKEN')
 
-
-bot = commands.Bot(command_prefix='')
+intents = discord.Intents.default()
+intents.members = True
+bot = commands.Bot(command_prefix='', intents=intents)
 
 
 # Google map推薦餐廳
@@ -150,12 +151,12 @@ async def on_member_join(member):
     # zyoi fan club
     if member.guild.id == 842461509477204018:
         channel = bot.get_channel(842461530066649111)
-        await channel.send(f'{member} hey r u fan of zyoi?🔪')
+        await channel.send(f"{member.mention} hey r u fan of zyoi?🔪")
     
     # 多樂一甲
     if member.guild.id == 885329184166137906:
         channel = bot.get_channel(893025355722539019)
-        await channel.send(f'{member} 進來後請把暱稱改成本名')
+        await channel.send(f"{member.mention} 進來後請把暱稱改成本名")
     
     
 # 和呱YA聊天
