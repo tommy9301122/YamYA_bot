@@ -325,35 +325,23 @@ async def on_message(message):
 
             if food_class=='中式' or food_class=='台式':
                 search_food = random.choice(food_c)
-                try:
-                    restaurant = googlemaps_search_food(search_food, search_place)
-                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
-                    embed.set_author(name = search_food+random.choice(ending_list))
-                    await message.channel.send(embed=embed)
-                except:
-                    pass
-
+                
             elif food_class=='日式' :
                 search_food = random.choice(food_j)
-                try:
-                    restaurant = googlemaps_search_food(search_food, search_place)
-                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
-                    embed.set_author(name = search_food+random.choice(ending_list))
-                    await message.channel.send(embed=embed)
-                except:
-                    pass
-
+                
             elif food_class=='美式' :
                 search_food = random.choice(food_a)
-                try:
-                    restaurant = googlemaps_search_food(search_food, search_place)
-                    embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
-                    embed.set_author(name = search_food+random.choice(ending_list))
-                    await message.channel.send(embed=embed)
-                except:
-                    pass
+                
             else:
                 await message.channel.send('格式好像錯了 º﹃º')
+                
+            try:
+                restaurant = googlemaps_search_food(search_food, search_place)
+                embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
+                embed.set_author(name = search_food+random.choice(ending_list))
+                await message.channel.send(embed=embed)
+            except:
+                pass
             
 
     ####################################################### 神麻婆卡片    
@@ -379,34 +367,14 @@ async def on_message(message):
                 df_beatmaps['status'] = df_beatmaps.approved.map({'1':'Rank','4':'Love'}).fillna('Unrank')
 
                 # 類別ID轉名稱
-                df_beatmaps['genre_id'] = df_beatmaps.genre_id.map({'1':'Unspecified',
-                                                                    '2':'Video Game',
-                                                                    '3':'Anime',
-                                                                    '4':'Rock',
-                                                                    '5':'Pop',
-                                                                    '6':'Other',
-                                                                    '7':'Novelty',
-                                                                    '8':'Hip Hop',
-                                                                    '9':'Electronic',
-                                                                    '10':'Metal',
-                                                                    '11':'Classical',
-                                                                    '12':'Folk',
-                                                                    '13':'Jazz'})
+                df_beatmaps['genre_id'] = df_beatmaps.genre_id.map({'1':'Unspecified', '2':'Video Game', '3':'Anime', '4':'Rock', '5':'Pop',
+                                                                    '6':'Other', '7':'Novelty', '8':'Hip Hop', '9':'Electronic', '10':'Metal', 
+                                                                    '11':'Classical', '12':'Folk', '13':'Jazz'})
 
                 # 語言ID轉名稱
-                df_beatmaps['language_id'] = df_beatmaps.language_id.map({'1':'Unspecified',
-                                                                          '2':'English',
-                                                                          '3':'Japanese',
-                                                                          '4':'Chinese',
-                                                                          '5':'Instrumental',
-                                                                          '6':'Korean',
-                                                                          '7':'FrenchItalian',
-                                                                          '8':'German',
-                                                                          '9':'Swedish',
-                                                                          '10':'Spanish',
-                                                                          '11':'Polish',
-                                                                          '12':'Russian',
-                                                                          '14':'Other'})
+                df_beatmaps['language_id'] = df_beatmaps.language_id.map({'1':'Unspecified', '2':'English', '3':'Japanese', '4':'Chinese', '5':'Instrumental',
+                                                                          '6':'Korean', '7':'FrenchItalian', '8':'German', '9':'Swedish', '10':'Spanish', 
+                                                                          '11':'Polish', '12':'Russian', '14':'Other'})
 
                 # 將title和artist的unicode遺失值用英文補齊
                 df_beatmaps['artist_unicode'] = df_beatmaps['artist_unicode'].fillna(df_beatmaps['artist'])
@@ -423,19 +391,10 @@ async def on_message(message):
                 df_beatmaps['last_update'] = pd.to_datetime(df_beatmaps['last_update'], format='%Y-%m-%d %H:%M:%S')
 
                 # groupby
-                df_beatmaps = df_beatmaps.groupby('beatmapset_id').agg({'beatmap_id':'count',
-                                                                         'status':'min',
-                                                                         'genre_id':'min',
-                                                                         'language_id':'min',
-                                                                         'title_unicode':'min',
-                                                                         'artist_unicode':'min',
-                                                                         'approved_date':'min', 
-                                                                         'submit_date':'min', 
-                                                                         'last_update':'min', 
-                                                                         'favourite_count':'min',
-                                                                         'playcount':'sum'}).reset_index(drop=False)
-
-
+                df_beatmaps = df_beatmaps.groupby('beatmapset_id').agg({'beatmap_id':'count', 'status':'min', 'genre_id':'min', 'language_id':'min',
+                                                                        'title_unicode':'min', 'artist_unicode':'min',
+                                                                        'approved_date':'min', 'submit_date':'min', 'last_update':'min', 
+                                                                        'favourite_count':'min', 'playcount':'sum'}).reset_index(drop=False)
 
                 mapper_id = beatmaps[0].get('creator_id')
                 mapper_name = requests.get('https://osu.ppy.sh/api/get_user?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper_id).json()[0].get('username')
