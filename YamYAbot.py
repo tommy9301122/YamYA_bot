@@ -143,6 +143,21 @@ async def on_ready():
     await bot.change_presence(status= status_w, activity=activity_w)
     
     
+# 新進成員 (依伺服器)
+@bot.event
+async def on_member_join(member):
+    
+    # zyoi fan club
+    if member.guild.id == 842461509477204018:
+        channel = bot.get_channel(842461530066649111)
+        await channel.send(f'{member} hey r u fan of zyoi?🔪')
+    
+    # 多樂一甲
+    if member.guild.id == 885329184166137906:
+        channel = bot.get_channel(893025355722539019)
+        await channel.send(f'{member} 進來後請把暱稱改成本名')
+    
+    
 # 和呱YA聊天
 @bot.command()
 async def 呱YA(ctx, input_text):
