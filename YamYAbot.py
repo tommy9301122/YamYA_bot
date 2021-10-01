@@ -133,13 +133,8 @@ def get_AniList_character(AniList_userName, character_gender_input):
 async def on_ready():
     print('目前登入身份：', bot.user)
     
-    guilds = bot.guilds
-    print('Server:')
-    for guild in guilds:
-        print(guild.name)
-    
     status_w = discord.Status.online  #Status : online（上線）,offline（下線）,idle（閒置）,dnd（請勿打擾）,invisible（隱身）
-    activity_w = discord.Activity(type=discord.ActivityType.playing, name="YamYA我把拔")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
+    activity_w = discord.Activity(type=discord.ActivityType.playing, name="不可以色色")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
 
     await bot.change_presence(status= status_w, activity=activity_w)
     
@@ -157,6 +152,25 @@ async def on_member_join(member):
     if member.guild.id == 885329184166137906:
         channel = bot.get_channel(893025355722539019)
         await channel.send(f"{member.mention} 進來後請把暱稱改成本名")
+        
+        
+# 取得呱YA所有所在伺服器列表(名稱、人數)
+@bot.command()
+async def YamYA_info(ctx):
+    guilds = bot.guilds
+    all_server_list = [guild.name for guild in guilds]
+    member_count_list = [guild.member_count for guild in guilds]
+    
+    all_server_count = len(all_server_list)
+    all_member_count = sum(member_count_list)
+    
+    description_main = ''
+    for server_name, member_number in zip(all_server_list, member_count_list):
+        description_main = description_main+server_name+'    '+str(member_number)+'\n'
+    # 卡片
+    embed = discord.Embed(title='YamYA Bot Join Server Info', description=description_main)
+    embed.set_footer(text='> 伺服器數量:'+str(all_server_count)+'  總人數:'+str(all_member_count))
+    await ctx.send(embed=embed)
     
     
 # 和呱YA聊天
@@ -169,15 +183,39 @@ async def 呱YA(ctx, input_text):
     while not resp[0]:
         await asyncio.sleep(0.5)
     await ctx.send(resp[0])
+    
+    
+# NSFW
+gif_class_list_nsfw = ['random_hentai_gif','nsfw_neko_gif','classic', 'bj','pussy','boobs','feetg','solog','pwankg']
+title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','鮑鮑','奶子ლ(́◉◞౪◟◉ლ)','🦵','ꈍ ꈍ','👆🖐🤞💦💦']
+
+@commands.is_nsfw()
+@bot.command()
+async def 射了(ctx):
+    embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
+    embed.set_image(url=nekos.img('cum'))
+    await ctx.send(embed=embed)
+    
+@commands.is_nsfw()
+@bot.command()
+async def 色色(ctx):
+    random_gif_nsfw = random.choice(list(zip(gif_class_list_nsfw, title_list_nsfw)))
+    embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
+    embed.set_image(url=nekos.img(random_gif_nsfw[0]))
+    await ctx.send(embed=embed)
 
 
-# 忽略指令錯誤error
+# 忽略指令錯誤error / NSFW警告
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
         return
     if isinstance(error, commands.MissingRequiredArgument):
         return
+    if isinstance(error, commands.errors.NSFWChannelRequired):
+        embed=discord.Embed(title="🔞這個頻道不可以色色!!", color=0xe74c3c)
+        embed.set_image(url='https://imgur.dcard.tw/D7K3R0Rh.jpg')
+        return await ctx.send(embed=embed)
     raise error
     
 
