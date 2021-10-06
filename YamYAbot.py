@@ -17,7 +17,7 @@ import nekos
 import googlemaps
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound
 import time
 import asyncio
@@ -126,6 +126,34 @@ def get_AniList_character(AniList_userName, character_gender_input):
     
     return character_name, character_image
 
+#################################################################################################################################################
+
+# 自動推播
+@tasks.loop(seconds=60)
+async def broadcast():
+    
+    # zyoi fan club
+    utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
+    # 早上推播天氣預報
+    if utc8_time == '0727':
+        channel = bot.get_channel(842463449467453491)
+        # 取得各縣市天氣
+        url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
+        r = requests.get(url)
+        data = r.json()['records']['locations'][0]['location']
+
+        embed = discord.Embed(title=('新的一天! 大家早安( •̀ ω •́ )✧ '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x00d9ff)
+        for loc_num, loc_name in zip([12,9,20,17,6], ['基隆','臺北','臺中','嘉義','臺南']):
+            weather_data = data[loc_num]['weatherElement']
+            rain = weather_data[0]['time'][0]['elementValue'][0]['value']
+            temp = weather_data[1]['time'][0]['elementValue'][0]['value']
+            weat = weather_data[6]['time'][0]['elementValue'][0]['value']
+            embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'  ⛅'+weat, inline=False)
+        await channel.send(embed=embed)
+    # 晚上提醒阿龍楚打RANK
+    if utc8_time == '1927':
+        channel = bot.get_channel(851157759872335913)
+        await channel.send('<@553890319276703744> 阿龍楚你還欠很多GD!')
 
 
 # 啟動
@@ -134,8 +162,8 @@ async def on_ready():
     print('目前登入身份：', bot.user)
     
     status_w = discord.Status.online  #Status : online（上線）,offline（下線）,idle（閒置）,dnd（請勿打擾）,invisible（隱身）
-    activity_w = discord.Activity(type=discord.ActivityType.playing, name="不可以色色")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
-
+    activity_w = discord.Activity(type=discord.ActivityType.playing, name="YamYA我把拔")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
+    broadcast.start() # 推播
     await bot.change_presence(status= status_w, activity=activity_w)
     
     
