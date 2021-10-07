@@ -150,10 +150,6 @@ async def broadcast():
             weat = weather_data[6]['time'][0]['elementValue'][0]['value']
             embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'  ⛅'+weat, inline=False)
         await channel.send(embed=embed)
-    # 晚上提醒阿龍楚打RANK
-    if utc8_time == '1927':
-        channel = bot.get_channel(851157759872335913)
-        await channel.send('<@553890319276703744> 阿龍楚你還欠很多GD!')
 
 
 # 啟動
@@ -223,7 +219,7 @@ async def 射了(ctx):
     embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
     embed.set_image(url=nekos.img('cum'))
     await ctx.send(embed=embed)
-    
+
 @commands.is_nsfw()
 @bot.command()
 async def 色色(ctx):
