@@ -199,14 +199,43 @@ async def YamYA_info(ctx):
     
 # 和呱YA聊天
 @bot.command()
-async def 呱YA(ctx, input_text):
-    resp = [None]
-    def get():
-        resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
-    asyncio.get_event_loop().run_in_executor(None, get)
-    while not resp[0]:
-        await asyncio.sleep(0.5)
-    await ctx.send(resp[0])
+async def 呱YA(ctx, *args):
+    
+    if len(args)==0:
+        await ctx.send(random.choice(YamYABot_murmur))
+        
+    else :
+        input_text = ' '.join(args)
+        resp = [None]
+        def get():
+            resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
+        asyncio.get_event_loop().run_in_executor(None, get)
+        while not resp[0]:
+            await asyncio.sleep(0.5)
+        await ctx.send(resp[0])
+        
+    
+# 笑話
+@bot.command()
+async def 笑話(ctx):
+    ptt = PttJokes(1)
+    joke_class_list = ['笑話','猜謎','耍冷','XD']
+    while True:
+        try:
+            joke_output = ptt.output()
+            if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
+                joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
+
+                joke_title = re.search('.*\\n',joke_output)[0]
+                joke_foot = re.search('\\n.*From ptt',joke_output)[0]
+                joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
+                break
+        except:
+            pass
+
+    embed = discord.Embed(title=joke_title, description=joke_main)
+    embed.set_footer(text=joke_foot)
+    await ctx.send(embed=embed)
     
     
 # NSFW
@@ -242,6 +271,7 @@ async def on_command_error(ctx, error):
         return await ctx.send(embed=embed)
     raise error
     
+    
 
 # on_message
 @bot.event
@@ -259,9 +289,6 @@ async def on_message(message):
         
     if message.content.lower() == "owo":
         await message.channel.send(f"owo, {message.author.name}")
-        
-    if message.content.lower() == '呱ya':
-        await message.channel.send(random.choice(YamYABot_murmur))
         
     
     ####################################################### 代替呱YA講話
@@ -282,30 +309,6 @@ async def on_message(message):
                 await message.channel.send("https://i.imgur.com/PT5gInL.png")
             if k == 1:
                 await message.channel.send("AzRaeL isn't so great? Are you kidding me? When was the last time you saw a player can make storyboard that has beautiful special effect, amazing lyrics and geometry. Mapping with amazing patterns, perfect hitsounds and satisfying flow? AzRaeL makes mapping to another level, and we will be blessed if we ever see a taiwanese with his mapping skill and passion for the game again. Amateurre breaks records. Sotarks breaks records. AzRaeL breaks the rules. You can keep your statistics, I prefer the AzGoD.")
-    
-    
-    ###################################################### 笑話
-    
-    if message.content=='笑話' :
-        
-        ptt = PttJokes(1)
-        joke_class_list = ['笑話','猜謎','耍冷','XD']
-        while True:
-            try:
-                joke_output = ptt.output()
-                if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
-                    joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
-
-                    joke_title = re.search('.*\\n',joke_output)[0]
-                    joke_foot = re.search('\\n.*From ptt',joke_output)[0]
-                    joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
-                    break
-            except:
-                pass
-            
-        embed = discord.Embed(title=joke_title, description=joke_main)
-        embed.set_footer(text=joke_foot)
-        await message.channel.send(embed=embed)
         
     
     ###################################################### 其他彩蛋
@@ -350,7 +353,6 @@ async def on_message(message):
                 
     
     ####################################################### 午餐吃什麼?
-
     #結尾用語
     ending_list = ['怎麼樣?','好吃',' 98','?','']
     
