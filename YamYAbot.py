@@ -136,10 +136,10 @@ async def broadcast():
     utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
     if utc8_time == '0727': # 時間
         channel = bot.get_channel(842463449467453491) # 指定頻道 (zyoi fan club)
-        url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314' # 取得各縣市天氣
+        # 取得台灣各縣市天氣預報
+        url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
         r = requests.get(url)
         data = r.json()['records']['locations'][0]['location']
-
         embed = discord.Embed(title=('新的一天! 大家早安( •̀ ω •́ )✧ '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x00d9ff)
         for loc_num, loc_name in zip([12,9,20,17,6], ['基隆','臺北','臺中','嘉義','臺南']):
             weather_data = data[loc_num]['weatherElement']
@@ -147,6 +147,12 @@ async def broadcast():
             temp = weather_data[1]['time'][0]['elementValue'][0]['value']
             weat = weather_data[6]['time'][0]['elementValue'][0]['value']
             embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'  ⛅'+weat, inline=False)
+        # 取得香港天氣預報
+        weat_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=flw&lang=tc').json()['forecastDesc'].split("。", 1)[1]
+        forecast_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc').json()['weatherForecast'][0]
+        temp_hk = str(int((forecast_hk['forecastMaxtemp']['value']+forecast_hk['forecastMintemp']['value'])/2))
+        rain_hk = str(int((forecast_hk['forecastMaxrh']['value']+forecast_hk['forecastMinrh']['value'])/2))
+        embed.add_field(name='香港' ,value='☂'+rain_hk+'%  🌡'+temp_hk+'°C  ⛅'+weat_hk, inline=False)
         await channel.send(embed=embed)
 
 
