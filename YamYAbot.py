@@ -146,7 +146,7 @@ async def broadcast():
             rain = weather_data[0]['time'][0]['elementValue'][0]['value']
             temp = weather_data[1]['time'][0]['elementValue'][0]['value']
             weat = weather_data[6]['time'][0]['elementValue'][0]['value']
-            embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'  ⛅'+weat, inline=False)
+            embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'°C  ⛅'+weat, inline=False)
         # 取得香港天氣預報
         weat_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=flw&lang=tc').json()['forecastDesc'].split("。", 1)[1]
         forecast_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc').json()['weatherForecast'][0]
