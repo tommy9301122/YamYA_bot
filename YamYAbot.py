@@ -128,20 +128,18 @@ def get_AniList_character(AniList_userName, character_gender_input):
 
 #################################################################################################################################################
 
-# 自動推播
+# [自動推播] 
 @tasks.loop(seconds=60)
 async def broadcast():
     
-    # zyoi fan club
-    utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
     # 早上推播天氣預報
-    if utc8_time == '0727':
-        channel = bot.get_channel(842463449467453491)
-        # 取得各縣市天氣
+    utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
+    if utc8_time == '0727': # 時間
+        channel = bot.get_channel(842463449467453491) # 指定頻道 (zyoi fan club)
+        # 取得台灣各縣市天氣預報
         url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
         r = requests.get(url)
         data = r.json()['records']['locations'][0]['location']
-
         embed = discord.Embed(title=('新的一天! 大家早安( •̀ ω •́ )✧ '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x00d9ff)
         for loc_num, loc_name in zip([12,9,20,17,6], ['基隆','臺北','臺中','嘉義','臺南']):
             weather_data = data[loc_num]['weatherElement']
@@ -149,10 +147,16 @@ async def broadcast():
             temp = weather_data[1]['time'][0]['elementValue'][0]['value']
             weat = weather_data[6]['time'][0]['elementValue'][0]['value']
             embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'  ⛅'+weat, inline=False)
+        # 取得香港天氣預報
+        weat_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=flw&lang=tc').json()['forecastDesc'].split("。", 1)[1]
+        forecast_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc').json()['weatherForecast'][0]
+        temp_hk = str(int((forecast_hk['forecastMaxtemp']['value']+forecast_hk['forecastMintemp']['value'])/2))
+        rain_hk = str(int((forecast_hk['forecastMaxrh']['value']+forecast_hk['forecastMinrh']['value'])/2))
+        embed.add_field(name='香港' ,value='☂'+rain_hk+'%  🌡'+temp_hk+'°C  ⛅'+weat_hk, inline=False)
         await channel.send(embed=embed)
 
 
-# 啟動
+# [啟動]
 @bot.event
 async def on_ready():
     print('目前登入身份：', bot.user)
@@ -163,7 +167,7 @@ async def on_ready():
     await bot.change_presence(status= status_w, activity=activity_w)
     
     
-# 新進成員 (依伺服器)
+# [新進成員] (依伺服器)
 @bot.event
 async def on_member_join(member):
     
@@ -178,7 +182,7 @@ async def on_member_join(member):
         await channel.send(f"{member.mention} 進來後請把暱稱改成本名")
         
         
-# 取得呱YA所有所在伺服器列表(名稱、人數)
+# [指令] YamYA_info : 取得呱YA所有所在伺服器列表(名稱、人數)
 @bot.command()
 async def YamYA_info(ctx):
     guilds = bot.guilds
@@ -197,22 +201,282 @@ async def YamYA_info(ctx):
     await ctx.send(embed=embed)
     
     
-# 和呱YA聊天
+# [指令] 呱YA : 和呱YA聊天
 @bot.command()
-async def 呱YA(ctx, input_text):
-    resp = [None]
-    def get():
-        resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
-    asyncio.get_event_loop().run_in_executor(None, get)
-    while not resp[0]:
-        await asyncio.sleep(0.5)
-    await ctx.send(resp[0])
+async def 呱YA(ctx, *args):
     
+    if len(args)==0:
+        await ctx.send(random.choice(YamYABot_murmur))
+        
+    else :
+        input_text = ' '.join(args)
+        resp = [None]
+        def get():
+            resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
+        asyncio.get_event_loop().run_in_executor(None, get)
+        while not resp[0]:
+            await asyncio.sleep(0.5)
+        await ctx.send(resp[0])
+        
     
-# NSFW
-gif_class_list_nsfw = ['random_hentai_gif','nsfw_neko_gif','classic', 'bj','pussy','boobs','feetg','solog','pwankg']
-title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','鮑鮑','奶子ლ(́◉◞౪◟◉ლ)','🦵','ꈍ ꈍ','👆🖐🤞💦💦']
+# [指令] 笑話 :
+@bot.command()
+async def 笑話(ctx):
+    ptt = PttJokes(1)
+    joke_class_list = ['笑話','猜謎','耍冷','XD']
+    while True:
+        try:
+            joke_output = ptt.output()
+            if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
+                joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
 
+                joke_title = re.search('.*\\n',joke_output)[0]
+                joke_foot = re.search('\\n.*From ptt',joke_output)[0]
+                joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
+                break
+        except:
+            pass
+
+    embed = discord.Embed(title=joke_title, description=joke_main)
+    embed.set_footer(text=joke_foot)
+    await ctx.send(embed=embed)
+
+
+# [指令] 全婆俠 :
+@bot.command()
+async def 全婆俠(ctx, *args):
+    AniList_userName = ' '.join(args)
+    character_gender_input = random.choice(['Female','Male'])
+    random_character = get_AniList_character(AniList_userName, character_gender_input)
+    if character_gender_input == 'Male':
+        wifu_gender = '老公'
+    else:
+        wifu_gender = '婆'
+    embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我'+wifu_gender, color=0x7875ff)
+    embed.set_image(url=random_character[1])
+    await ctx.send(embed=embed)
+    
+# [指令] waifu :
+@bot.command()
+async def waifu(ctx, *args):
+    AniList_userName = ' '.join(args)
+    character_gender_input = 'Female'
+    random_character = get_AniList_character(AniList_userName, character_gender_input)
+    embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我婆', color=0x7875ff)
+    embed.set_image(url=random_character[1])
+    await ctx.send(embed=embed)
+    
+# [指令] husbando :
+@bot.command()
+async def husbando(ctx, *args):
+    AniList_userName = ' '.join(args)
+    character_gender_input = 'Male'
+    random_character = get_AniList_character(AniList_userName, character_gender_input)
+    embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我老公', color=0x7875ff)
+    embed.set_image(url=random_character[1])
+    await ctx.send(embed=embed)
+    
+    
+# [指令] AMQ : 隨機選一首動畫OP/ED撥放
+@bot.command()
+async def AMQ(ctx, *args):
+    AniList_userName = ' '.join(args)
+    query = '''
+    query ($userName: String, $MediaListStatus: MediaListStatus, $page: Int, $perPage: Int) {
+        Page (page: $page, perPage: $perPage) {
+            pageInfo {hasNextPage}
+            mediaList (userName: $userName, status: $MediaListStatus) {
+                media {title{romaji english native}
+                  }
+            }
+        }
+    }
+    '''
+    # COMPLETED
+    page_number = 1
+    all_anime_list = []
+    next_page = True
+    while next_page is True:
+        variables = {'userName': AniList_userName, 'MediaListStatus': 'COMPLETED', 'page': page_number, 'perPage': 50 }
+        response = requests.post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
+        next_page = response.get('data').get('Page').get('pageInfo').get('hasNextPage')
+        page_number += 1
+
+        anime_list = []
+        for anime in response.get('data').get('Page').get('mediaList'):
+            romaji_title = anime.get('media').get('title').get('romaji')
+            english_title = anime.get('media').get('title').get('english')
+            if romaji_title:
+                anime_list.append([romaji_title,english_title])
+        all_anime_list = all_anime_list+anime_list
+    # WATCHING
+    page_number = 1
+    next_page = True
+    while next_page is True:
+        variables = {'userName': AniList_userName, 'MediaListStatus': 'CURRENT', 'page': page_number, 'perPage': 50 }
+        response = requests.post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
+        next_page = response.get('data').get('Page').get('pageInfo').get('hasNextPage')
+        page_number += 1
+
+        anime_list = []
+        for anime in response.get('data').get('Page').get('mediaList'):
+            romaji_title = anime.get('media').get('title').get('romaji')
+            english_title = anime.get('media').get('title').get('english')
+            if romaji_title:
+                anime_list.append([romaji_title,english_title])
+        all_anime_list = all_anime_list+anime_list
+    # 隨機選一首
+    while True:
+        try:
+            saerch_name = random.choice(all_anime_list)
+            animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/'+saerch_name[0]).json()
+            if len(animethemes.get('anime'))==0:
+                animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/'+saerch_name[1]).json()
+            ######## 
+            # 柯南回歸用:
+            if 'Meitantei Conan' in saerch_name[0]:
+                animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/Meitantei Conan').json()
+                saerch_name = ['Meitantei Conan','Detective Conan']
+            # Another排錯:
+            if saerch_name[1] == 'Another':
+                continue
+            ########
+            anime_num = random.randint(0,len(animethemes.get('anime'))-1)
+            animetheme_num = random.randint(0,len(animethemes.get('anime')[anime_num].get('themes'))-1)
+            theme_type = animethemes.get('anime')[anime_num].get('themes')[animetheme_num].get('type')
+            theme_title = animethemes.get('anime')[anime_num].get('themes')[animetheme_num].get('title')
+            theme_url = animethemes.get('anime')[anime_num].get('themes')[animetheme_num].get('mirrors')[0].get('mirror')
+            await ctx.send('**'+saerch_name[1]+'** '+theme_type+':  '+theme_title+'\n'+theme_url)
+            break
+        except:
+            pass
+        
+        
+# [指令] 神麻婆 : 神麻婆卡片
+@bot.command()
+async def 神麻婆(ctx, *args):
+    try:
+        mapper = ' '.join(args)
+        get_beatmaps = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper).json()
+        beatmaps = {}
+        num = 0
+        for i in get_beatmaps:
+            beatmaps[num] = i
+            num = num+1
+        df_beatmaps  = pd.DataFrame.from_dict(beatmaps, "index")
+        if df_beatmaps.head(1).creator_id.values[0] == '0':
+            await message.channel.send('我找不到這位神麻婆的圖;w;')
+        else:
+            df_beatmaps['status'] = df_beatmaps.approved.map({'1':'Rank','4':'Love'}).fillna('Unrank')
+            df_beatmaps['genre_id'] = df_beatmaps.genre_id.map({'1':'Unspecified', '2':'Video Game', '3':'Anime', '4':'Rock', '5':'Pop',
+                                                                '6':'Other', '7':'Novelty', '8':'Hip Hop', '9':'Electronic', '10':'Metal', 
+                                                                '11':'Classical', '12':'Folk', '13':'Jazz'})
+            df_beatmaps['language_id'] = df_beatmaps.language_id.map({'1':'Unspecified', '2':'English', '3':'Japanese', '4':'Chinese', '5':'Instrumental',
+                                                                      '6':'Korean', '7':'FrenchItalian', '8':'German', '9':'Swedish', '10':'Spanish', 
+                                                                      '11':'Polish', '12':'Russian', '14':'Other'})
+            df_beatmaps['artist_unicode'] = df_beatmaps['artist_unicode'].fillna(df_beatmaps['artist']) # 將title和artist的unicode遺失值用英文補齊
+            df_beatmaps['title_unicode'] = df_beatmaps['title_unicode'].fillna(df_beatmaps['title'])
+            df_beatmaps['genre_id'] = df_beatmaps['genre_id'].fillna('Unspecified') # 類別、語言 補遺失值
+            df_beatmaps['language_id'] = df_beatmaps['language_id'].fillna('Unspecified')
+            
+            df_beatmaps = df_beatmaps.astype({'beatmapset_id':'int64','favourite_count':'int64','playcount':'int64'}) # 欄位資料型態
+            df_beatmaps['approved_date'] = pd.to_datetime(df_beatmaps['approved_date'], format='%Y-%m-%d %H:%M:%S')
+            df_beatmaps['submit_date'] = pd.to_datetime(df_beatmaps['submit_date'], format='%Y-%m-%d %H:%M:%S')
+            df_beatmaps['last_update'] = pd.to_datetime(df_beatmaps['last_update'], format='%Y-%m-%d %H:%M:%S')
+            df_beatmaps = df_beatmaps.groupby('beatmapset_id').agg({'beatmap_id':'count', 'status':'min', 'genre_id':'min', 'language_id':'min',
+                                                                    'title_unicode':'min', 'artist_unicode':'min',
+                                                                    'approved_date':'min', 'submit_date':'min', 'last_update':'min', 
+                                                                    'favourite_count':'min', 'playcount':'sum'}).reset_index(drop=False)
+            mapper_id = beatmaps[0].get('creator_id')
+            mapper_name = requests.get('https://osu.ppy.sh/api/get_user?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper_id).json()[0].get('username')
+            # 年齡
+            mapping_age = parse_date(datetime.datetime.now() - df_beatmaps.submit_date.min())
+            # 做圖數量
+            mapset_count = format( len(df_beatmaps),',')
+            rank_mapset_count = format( len(df_beatmaps.loc[(df_beatmaps.status=='Rank')]),',')
+            love_mapset_count = format( len(df_beatmaps.loc[(df_beatmaps.status=='Love')]),',')
+            # 收藏、遊玩數
+            favorites_count = format( df_beatmaps.favourite_count.sum(),',')
+            platcount_count = format( df_beatmaps.playcount.sum(),',')
+            # 最新的圖譜
+            New_mapset_id  = str(df_beatmaps.sort_values(by='last_update', ascending=False).head(1).beatmapset_id.values[0])
+            New_mapset_artist = df_beatmaps.sort_values(by='last_update', ascending=False).head(1).artist_unicode.values[0]
+            New_mapset_title = df_beatmaps.sort_values(by='last_update', ascending=False).head(1).title_unicode.values[0]
+            
+            # 卡片
+            embed = discord.Embed(title=mapper_name, url='https://osu.ppy.sh/users/'+mapper_id, color=0xff85bc)
+            embed.set_thumbnail(url="https://s.ppy.sh/a/"+mapper_id)
+            embed.add_field(name="Mapping Age ",value=mapping_age, inline=False)
+            embed.add_field(name="Beatmap Count ",value='✍'+mapset_count+'  ✅'+rank_mapset_count+'  ❤'+love_mapset_count, inline=True)
+            embed.add_field(name="Playcount & Favorites ",value='▶'+platcount_count+'  💖'+favorites_count, inline=True)
+            embed.add_field(name="New Mapset!  "+New_mapset_artist+" - "+New_mapset_title, value='https://osu.ppy.sh/beatmapsets/'+New_mapset_id ,inline=False)
+            embed.set_footer(text=date.today().strftime("%Y/%m/%d"))
+            await ctx.send(embed=embed)
+    except:
+        await ctx.send('我找不到這位神麻婆的圖;w;')
+            
+
+# [指令] icon bbcode: 輸出圖譜新版 icon bbcode
+@bot.command()
+async def icon(ctx, *args):
+    if args[0]=='bbcode':
+        try:
+            beatmap_url = args[1]
+            beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
+            beatmap_meta = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&s='+beatmap_id).json()
+            beatmap_difficulty_list = [meta.get('version') for meta in beatmap_meta]
+            beatmap_rating_list = [float(meta.get('difficultyrating')) for meta in beatmap_meta]
+            df_beatmap = pd.DataFrame([beatmap_difficulty_list,beatmap_rating_list]).T.rename(columns={0:'difficulty', 1:'rating'}).sort_values(by='rating', ascending=True)
+
+            print_str = ''
+            for index, row in df_beatmap.iterrows():
+                diff_rating = round(row['rating'],1)
+                diff_bbcode = '[img]https://raw.githubusercontent.com/Azuelle/osuStuff/master/diffs/gradient/difficon_std_'+get_rating_color(diff_rating)[1]+'%4016-gap.png[/img] [color='+get_rating_color(diff_rating)[0]+'][b]'+row['difficulty']+'[/b][/color]\n'
+                if len(print_str+diff_bbcode)>1990:  # 輸出上限2000字
+                    await ctx.send(print_str)
+                    print_str = ''
+                print_str = print_str+diff_bbcode
+            await ctx.send(print_str)
+        except:
+            await ctx.send('我找不到這張圖;w;')
+            
+            
+# [指令] combo color : 根據BG推薦 combo color
+@bot.command()
+async def combo(ctx, *args):
+    if args[0]=='color':
+        beatmap_url = args[1]
+        beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
+        color_num = 6
+        
+        img_url = 'https://b.ppy.sh/thumb/'+str(beatmap_id)+'l.jpg'
+        im = Image.open(requests.get(img_url, stream=True).raw)
+        #im = im.resize((150, 150))      # optional, to reduce time
+        ar = np.asarray(im)
+        shape = ar.shape
+        ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
+        codes, dist = scipy.cluster.vq.kmeans(ar, color_num)
+        
+        
+        recommend_combo_color = ''
+        
+        color_hex = '{:02x}{:02x}{:02x}'.format(int(round(codes[0][0])), int(round(codes[0][1])), int(round(codes[0][2])))
+        sixteenIntegerHex = int(color_hex, 16)
+        readableHex = int(hex(sixteenIntegerHex), 0)
+        
+        num_int = 1
+        for i in codes:
+            rgb_str = str((round(i[0]), round(i[1]), round(i[2])))
+            recommend_combo_color = recommend_combo_color+str(num_int)+'. '+rgb_str+'\n'
+            num_int+=1
+            
+        embed=discord.Embed(description=recommend_combo_color, color=readableHex)
+        embed.set_author(name='Combo Color Recommend', icon_url='https://raster.shields.io/badge/--'+color_hex+'.png')
+        embed.set_thumbnail(url=img_url)
+        await ctx.send(embed=embed)
+
+
+# [NSFW指令] 射了
 @commands.is_nsfw()
 @bot.command()
 async def 射了(ctx):
@@ -220,6 +484,10 @@ async def 射了(ctx):
     embed.set_image(url=nekos.img('cum'))
     await ctx.send(embed=embed)
 
+
+# [NSFW指令] 色色 : 隨機色情GIF
+gif_class_list_nsfw = ['random_hentai_gif','nsfw_neko_gif','classic', 'bj','pussy','boobs','feetg','solog','pwankg']
+title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','鮑鮑','奶子ლ(́◉◞౪◟◉ლ)','🦵','ꈍ ꈍ','👆🖐🤞💦💦']
 @commands.is_nsfw()
 @bot.command()
 async def 色色(ctx):
@@ -229,7 +497,7 @@ async def 色色(ctx):
     await ctx.send(embed=embed)
 
 
-# 忽略指令錯誤error / NSFW警告
+# [忽略error / NSFW警告] : 忽略所有前綴造成的指令錯誤、指令變數輸入錯誤、NSFW警告
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
@@ -241,6 +509,7 @@ async def on_command_error(ctx, error):
         embed.set_image(url='https://imgur.dcard.tw/D7K3R0Rh.jpg')
         return await ctx.send(embed=embed)
     raise error
+    
     
 
 # on_message
@@ -260,11 +529,8 @@ async def on_message(message):
     if message.content.lower() == "owo":
         await message.channel.send(f"owo, {message.author.name}")
         
-    if message.content.lower() == '呱ya':
-        await message.channel.send(random.choice(YamYABot_murmur))
-        
     
-    ####################################################### 代替呱YA講話
+    ###################################################### 代替呱YA講話
     if message.content.lower().startswith('呱ya說 '):
         repeat_mes = message.content.lower().split("呱ya說 ",1)[1]
         
@@ -282,30 +548,6 @@ async def on_message(message):
                 await message.channel.send("https://i.imgur.com/PT5gInL.png")
             if k == 1:
                 await message.channel.send("AzRaeL isn't so great? Are you kidding me? When was the last time you saw a player can make storyboard that has beautiful special effect, amazing lyrics and geometry. Mapping with amazing patterns, perfect hitsounds and satisfying flow? AzRaeL makes mapping to another level, and we will be blessed if we ever see a taiwanese with his mapping skill and passion for the game again. Amateurre breaks records. Sotarks breaks records. AzRaeL breaks the rules. You can keep your statistics, I prefer the AzGoD.")
-    
-    
-    ###################################################### 笑話
-    
-    if message.content=='笑話' :
-        
-        ptt = PttJokes(1)
-        joke_class_list = ['笑話','猜謎','耍冷','XD']
-        while True:
-            try:
-                joke_output = ptt.output()
-                if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
-                    joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
-
-                    joke_title = re.search('.*\\n',joke_output)[0]
-                    joke_foot = re.search('\\n.*From ptt',joke_output)[0]
-                    joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
-                    break
-            except:
-                pass
-            
-        embed = discord.Embed(title=joke_title, description=joke_main)
-        embed.set_footer(text=joke_foot)
-        await message.channel.send(embed=embed)
         
     
     ###################################################### 其他彩蛋
@@ -350,7 +592,6 @@ async def on_message(message):
                 
     
     ####################################################### 午餐吃什麼?
-
     #結尾用語
     ending_list = ['怎麼樣?','好吃',' 98','?','']
     
@@ -373,7 +614,6 @@ async def on_message(message):
         # 只輸入類別
         if len(comm)==2 and '式' in comm[1]:
             food_class = comm[1]
-
             if food_class=='中式' or food_class=='台式':
                 await message.channel.send(random.choice(food_c)+random.choice(ending_list))
             elif food_class=='日式' :
@@ -389,7 +629,6 @@ async def on_message(message):
             search_place = comm[1]
             try:
                 restaurant = googlemaps_search_food(search_food, search_place)
-                
                 embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
                 embed.set_author(name = search_food+random.choice(ending_list))
                 await message.channel.send(embed=embed)
@@ -400,19 +639,14 @@ async def on_message(message):
         if len(comm)==3 and '式' in comm[1]:
             food_class = comm[1]
             search_place = comm[2]
-
             if food_class=='中式' or food_class=='台式':
                 search_food = random.choice(food_c)
-                
             elif food_class=='日式' :
                 search_food = random.choice(food_j)
-                
             elif food_class=='美式' :
                 search_food = random.choice(food_a)
-                
             else:
                 await message.channel.send('格式好像錯了 º﹃º')
-                
             try:
                 restaurant = googlemaps_search_food(search_food, search_place)
                 embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
@@ -421,272 +655,6 @@ async def on_message(message):
             except:
                 pass
             
-
-    ####################################################### 神麻婆卡片    
-    if message.content.startswith('神麻婆 ') or message.content.startswith('god mapper '):
-        try:
-            try:
-                mapper = message.content.split('神麻婆 ',1)[1]
-            except:
-                mapper = message.content.split('god mapper ',1)[1]
-                
-            get_beatmaps = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper).json()
-            beatmaps = {}
-            num = 0
-            for i in get_beatmaps:
-                beatmaps[num] = i
-                num = num+1
-            df_beatmaps  = pd.DataFrame.from_dict(beatmaps, "index")
-            
-            if df_beatmaps.head(1).creator_id.values[0] == '0':
-                await message.channel.send('我找不到這位神麻婆的圖;w;')
-            else:
-                # Rank & Love
-                df_beatmaps['status'] = df_beatmaps.approved.map({'1':'Rank','4':'Love'}).fillna('Unrank')
-
-                # 類別ID轉名稱
-                df_beatmaps['genre_id'] = df_beatmaps.genre_id.map({'1':'Unspecified', '2':'Video Game', '3':'Anime', '4':'Rock', '5':'Pop',
-                                                                    '6':'Other', '7':'Novelty', '8':'Hip Hop', '9':'Electronic', '10':'Metal', 
-                                                                    '11':'Classical', '12':'Folk', '13':'Jazz'})
-
-                # 語言ID轉名稱
-                df_beatmaps['language_id'] = df_beatmaps.language_id.map({'1':'Unspecified', '2':'English', '3':'Japanese', '4':'Chinese', '5':'Instrumental',
-                                                                          '6':'Korean', '7':'FrenchItalian', '8':'German', '9':'Swedish', '10':'Spanish', 
-                                                                          '11':'Polish', '12':'Russian', '14':'Other'})
-
-                # 將title和artist的unicode遺失值用英文補齊
-                df_beatmaps['artist_unicode'] = df_beatmaps['artist_unicode'].fillna(df_beatmaps['artist'])
-                df_beatmaps['title_unicode'] = df_beatmaps['title_unicode'].fillna(df_beatmaps['title'])
-
-                # 類別、語言 補遺失值
-                df_beatmaps['genre_id'] = df_beatmaps['genre_id'].fillna('Unspecified')
-                df_beatmaps['language_id'] = df_beatmaps['language_id'].fillna('Unspecified')
-
-                # 欄位資料型態
-                df_beatmaps = df_beatmaps.astype({'beatmapset_id':'int64','favourite_count':'int64','playcount':'int64'})
-                df_beatmaps['approved_date'] = pd.to_datetime(df_beatmaps['approved_date'], format='%Y-%m-%d %H:%M:%S')
-                df_beatmaps['submit_date'] = pd.to_datetime(df_beatmaps['submit_date'], format='%Y-%m-%d %H:%M:%S')
-                df_beatmaps['last_update'] = pd.to_datetime(df_beatmaps['last_update'], format='%Y-%m-%d %H:%M:%S')
-
-                # groupby
-                df_beatmaps = df_beatmaps.groupby('beatmapset_id').agg({'beatmap_id':'count', 'status':'min', 'genre_id':'min', 'language_id':'min',
-                                                                        'title_unicode':'min', 'artist_unicode':'min',
-                                                                        'approved_date':'min', 'submit_date':'min', 'last_update':'min', 
-                                                                        'favourite_count':'min', 'playcount':'sum'}).reset_index(drop=False)
-
-                mapper_id = beatmaps[0].get('creator_id')
-                mapper_name = requests.get('https://osu.ppy.sh/api/get_user?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper_id).json()[0].get('username')
-                # 年齡
-                mapping_age = parse_date(datetime.datetime.now() - df_beatmaps.submit_date.min())
-                # 做圖數量
-                mapset_count = format( len(df_beatmaps),',')
-                rank_mapset_count = format( len(df_beatmaps.loc[(df_beatmaps.status=='Rank')]),',')
-                love_mapset_count = format( len(df_beatmaps.loc[(df_beatmaps.status=='Love')]),',')
-                # 收藏、遊玩數
-                favorites_count = format( df_beatmaps.favourite_count.sum(),',')
-                platcount_count = format( df_beatmaps.playcount.sum(),',')
-
-                # 最新的圖譜
-                New_mapset_id  = str(df_beatmaps.sort_values(by='last_update', ascending=False).head(1).beatmapset_id.values[0])
-                New_mapset_artist = df_beatmaps.sort_values(by='last_update', ascending=False).head(1).artist_unicode.values[0]
-                New_mapset_title = df_beatmaps.sort_values(by='last_update', ascending=False).head(1).title_unicode.values[0]
-
-
-                # 卡片
-                embed = discord.Embed(title=mapper_name, url='https://osu.ppy.sh/users/'+mapper_id, color=0xff85bc)
-
-                embed.set_thumbnail(url="https://s.ppy.sh/a/"+mapper_id)
-
-                embed.add_field(name="Mapping Age ",value=mapping_age, inline=False)
-                embed.add_field(name="Beatmap Count ",value='✍'+mapset_count+'  ✅'+rank_mapset_count+'  ❤'+love_mapset_count, inline=True)
-                embed.add_field(name="Playcount & Favorites ",value='▶'+platcount_count+'  💖'+favorites_count, inline=True)
-                embed.add_field(name="New Mapset!  "+New_mapset_artist+" - "+New_mapset_title, value='https://osu.ppy.sh/beatmapsets/'+New_mapset_id ,inline=False)
-
-                embed.set_footer(text=date.today().strftime("%Y/%m/%d"))
-                await message.channel.send(embed=embed)
-        except:
-            await message.channel.send('我找不到這位神麻婆的圖;w;')
-            
-            
-    ######################################################## 輸出圖譜 icon bbcode
-    if message.content.startswith('icon bbcode '):
-        try:
-            # 利用osu api取得難度名稱與星級
-            beatmap_url = message.content.split("icon bbcode ",1)[1]
-            beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
-            beatmap_meta = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&s='+beatmap_id).json()
-            beatmap_difficulty_list = [meta.get('version') for meta in beatmap_meta]
-            beatmap_rating_list = [float(meta.get('difficultyrating')) for meta in beatmap_meta]
-            df_beatmap = pd.DataFrame([beatmap_difficulty_list,beatmap_rating_list]).T.rename(columns={0:'difficulty', 1:'rating'}).sort_values(by='rating', ascending=True)
-
-            print_str = ''
-            for index, row in df_beatmap.iterrows():
-                diff_rating = round(row['rating'],1)
-                diff_bbcode = '[img]https://raw.githubusercontent.com/Azuelle/osuStuff/master/diffs/gradient/difficon_std_'+get_rating_color(diff_rating)[1]+'%4016-gap.png[/img] [color='+get_rating_color(diff_rating)[0]+'][b]'+row['difficulty']+'[/b][/color]\n'
-                if len(print_str+diff_bbcode)>1990:  # 輸出上限2000字
-                    await message.channel.send(print_str)
-                    print_str = ''
-                print_str = print_str+diff_bbcode
-            await message.channel.send(print_str)
-        except:
-            await message.channel.send('我找不到這張圖;w;')
-            
-            
-    ######################################################## 根據BG推薦 combo color       
-    if message.content.startswith('combo color '):
-
-        beatmap_url = message.content.split("combo color ",1)[1]
-        beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
-        color_num = 6
-        
-        img_url = 'https://b.ppy.sh/thumb/'+str(beatmap_id)+'l.jpg'
-        im = Image.open(requests.get(img_url, stream=True).raw)
-        #im = im.resize((150, 150))      # optional, to reduce time
-        ar = np.asarray(im)
-        shape = ar.shape
-        ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
-        codes, dist = scipy.cluster.vq.kmeans(ar, color_num)
-        
-        
-        recommend_combo_color = ''
-        
-        color_hex = '{:02x}{:02x}{:02x}'.format(int(round(codes[0][0])), int(round(codes[0][1])), int(round(codes[0][2])))
-        sixteenIntegerHex = int(color_hex, 16)
-        readableHex = int(hex(sixteenIntegerHex), 0)
-        
-        num_int = 1
-        for i in codes:
-            rgb_str = str((round(i[0]), round(i[1]), round(i[2])))
-            recommend_combo_color = recommend_combo_color+str(num_int)+'. '+rgb_str+'\n'
-            num_int+=1
-            
-        embed=discord.Embed(description=recommend_combo_color, color=readableHex)
-        embed.set_author(name='Combo Color Recommend', icon_url='https://raster.shields.io/badge/--'+color_hex+'.png')
-        embed.set_thumbnail(url=img_url)
-        await message.channel.send(embed=embed)
-            
-            
-    ################################################################ 隨機喊婆
-    if message.content.startswith('全婆俠 ') :
-        AniList_userName = message.content.split("全婆俠 ",1)[1]
-        character_gender_input = random.choice(['Female','Male'])
-        
-        random_character = get_AniList_character(AniList_userName, character_gender_input)
-        
-        if character_gender_input == 'Male':
-            wifu_gender = '老公'
-        else:
-            wifu_gender = '婆'
-        embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我'+wifu_gender, color=0x7875ff)
-        embed.set_image(url=random_character[1])
-        await message.channel.send(embed=embed)
-    
-    
-    if message.content.startswith('waifu ') :
-        AniList_userName = message.content.split("waifu ",1)[1]
-        character_gender_input = 'Female'
-        
-        random_character = get_AniList_character(AniList_userName, character_gender_input)
-        
-        embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我婆', color=0x7875ff)
-        embed.set_image(url=random_character[1])
-        await message.channel.send(embed=embed)
-        
-
-    if message.content.startswith('husbando ') :
-        AniList_userName = message.content.split("husbando ",1)[1]
-        character_gender_input = 'Male'
-        
-        random_character = get_AniList_character(AniList_userName, character_gender_input)
-        
-        embed=discord.Embed(title=AniList_userName+': '+random_character[0]+'我老公', color=0x7875ff)
-        embed.set_image(url=random_character[1])
-        await message.channel.send(embed=embed)
-        
-        
-    ################################################################ 取得 AniList 其中一首歌曲
-    if message.content.startswith('AMQ '):
-        
-        AniList_userName = message.content.split("AMQ ",1)[1]
-
-        query = '''
-        query ($userName: String, $MediaListStatus: MediaListStatus, $page: Int, $perPage: Int) {
-            Page (page: $page, perPage: $perPage) {
-                pageInfo {hasNextPage}
-                mediaList (userName: $userName, status: $MediaListStatus) {
-                    media {title{romaji english native}
-                      }
-                }
-            }
-        }
-        '''
-        # COMPLETED
-        page_number = 1
-        all_anime_list = []
-        next_page = True
-        while next_page is True:
-            variables = {'userName': AniList_userName, 'MediaListStatus': 'COMPLETED', 'page': page_number, 'perPage': 50 }
-            response = requests.post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
-            next_page = response.get('data').get('Page').get('pageInfo').get('hasNextPage')
-            page_number += 1
-
-            anime_list = []
-            for anime in response.get('data').get('Page').get('mediaList'):
-                romaji_title = anime.get('media').get('title').get('romaji')
-                english_title = anime.get('media').get('title').get('english')
-                if romaji_title:
-                    anime_list.append([romaji_title,english_title])
-            all_anime_list = all_anime_list+anime_list
-            
-        # WATCHING
-        page_number = 1
-        next_page = True
-        while next_page is True:
-            variables = {'userName': AniList_userName, 'MediaListStatus': 'CURRENT', 'page': page_number, 'perPage': 50 }
-            response = requests.post('https://graphql.anilist.co', json={'query': query, 'variables': variables}).json()
-            next_page = response.get('data').get('Page').get('pageInfo').get('hasNextPage')
-            page_number += 1
-
-            anime_list = []
-            for anime in response.get('data').get('Page').get('mediaList'):
-                romaji_title = anime.get('media').get('title').get('romaji')
-                english_title = anime.get('media').get('title').get('english')
-                if romaji_title:
-                    anime_list.append([romaji_title,english_title])
-            all_anime_list = all_anime_list+anime_list
-
-
-        while True:
-            try:
-                saerch_name = random.choice(all_anime_list)
-
-                animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/'+saerch_name[0]).json()
-                if len(animethemes.get('anime'))==0:
-                    animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/'+saerch_name[1]).json()
-                
-                ######## 
-                # 柯南回歸用:
-                if 'Meitantei Conan' in saerch_name[0]:
-                    animethemes = requests.get('http://animethemes-api.herokuapp.com/api/v1/search/Meitantei Conan').json()
-                    saerch_name = ['Meitantei Conan','Detective Conan']
-                # Another排錯:
-                if saerch_name[1] == 'Another':
-                    continue
-                ########
-                
-                anime_num = random.randint(0,len(animethemes.get('anime'))-1)
-                animetheme_num = random.randint(0,len(animethemes.get('anime')[anime_num].get('themes'))-1)
-
-                theme_type = animethemes.get('anime')[anime_num].get('themes')[animetheme_num].get('type')
-                theme_title = animethemes.get('anime')[anime_num].get('themes')[animetheme_num].get('title')
-                theme_url = animethemes.get('anime')[anime_num].get('themes')[animetheme_num].get('mirrors')[0].get('mirror')
-
-                await message.channel.send('**'+saerch_name[1]+'** '+theme_type+':  '+theme_title+'\n'+theme_url)
-                break
-
-            except:
-                #print(saerch_name)
-                pass
             
     await bot.process_commands(message)
     
