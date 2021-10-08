@@ -27,7 +27,7 @@ Discord_token = os.environ.get('BOT_TOKEN')
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='', intents=intents)
+bot = commands.Bot(command_prefix='', intents=intents, help_command=None)
 
 
 # Google map推薦餐廳
@@ -494,6 +494,25 @@ async def 色色(ctx):
     random_gif_nsfw = random.choice(list(zip(gif_class_list_nsfw, title_list_nsfw)))
     embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
     embed.set_image(url=nekos.img(random_gif_nsfw[0]))
+    await ctx.send(embed=embed)
+    
+    
+# [指令] YamYA_invite : 邀請碼
+@bot.command()
+async def YamYA_invite(ctx):
+    await ctx.send("https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot")
+    
+    
+# [指令] help : 呱YA一號 指令與功能一覽
+@bot.command()
+async def help(ctx):
+    embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
+    embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]`", inline=False)
+    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `AMQ [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
+    embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
+    embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `呱YA [問題]`", inline=False)
+    embed.add_field(name="⛏機器人相關", value="`YamYA_info` \n `YamYA_invite` \n `help`", inline=False)
+    embed.set_footer(text="更新日期： 2021/10/08                    - YamYA")
     await ctx.send(embed=embed)
 
 
