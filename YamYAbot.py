@@ -1,6 +1,6 @@
 from PTT_jokes import PttJokes
 from bot_data import food_a, food_j, food_c, YamYABot_murmur
-
+import feedparser
 from colour import Color
 from PIL import Image
 import scipy
@@ -132,28 +132,11 @@ def get_AniList_character(AniList_userName, character_gender_input):
 @tasks.loop(seconds=60)
 async def broadcast():
     
-    # 早上推播天氣預報
+    # wysi
     utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
-    if utc8_time == '0727': # 時間
+    if utc8_time == '0727' and random.randint(1,7) == 1: # 時間 且機率發生
         channel = bot.get_channel(842463449467453491) # 指定頻道 (zyoi fan club)
-        # 取得台灣各縣市天氣預報
-        url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
-        r = requests.get(url)
-        data = r.json()['records']['locations'][0]['location']
-        embed = discord.Embed(title=('新的一天! 大家早安( •̀ ω •́ )✧ '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x00d9ff)
-        for loc_num, loc_name in zip([12,9,20,17,6], ['基隆','臺北','臺中','嘉義','臺南']):
-            weather_data = data[loc_num]['weatherElement']
-            rain = weather_data[0]['time'][0]['elementValue'][0]['value']
-            temp = weather_data[1]['time'][0]['elementValue'][0]['value']
-            weat = weather_data[6]['time'][0]['elementValue'][0]['value']
-            embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'°C  ⛅'+weat, inline=False)
-        # 取得香港天氣預報
-        weat_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=flw&lang=tc').json()['forecastDesc'].split("。", 1)[1]
-        forecast_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc').json()['weatherForecast'][0]
-        temp_hk = str(int((forecast_hk['forecastMaxtemp']['value']+forecast_hk['forecastMintemp']['value'])/2))
-        rain_hk = str(int((forecast_hk['forecastMaxrh']['value']+forecast_hk['forecastMinrh']['value'])/2))
-        embed.add_field(name='香港' ,value='☂'+rain_hk+'%  🌡'+temp_hk+'°C  ⛅'+weat_hk, inline=False)
-        await channel.send(embed=embed)
+        await channel.send('wysi')
 
 
 # [啟動]
@@ -240,6 +223,74 @@ async def 笑話(ctx):
     embed = discord.Embed(title=joke_title, description=joke_main)
     embed.set_footer(text=joke_foot)
     await ctx.send(embed=embed)
+    
+    
+# [指令] 新聞 :
+@bot.command()
+async def 新聞(ctx):
+    d = feedparser.parse('https://news.google.com/rss?hl=zh-TW&gl=TW&ceid=TW:zh-Hant')
+    n_title = [i.title for i in d.entries]
+    source_name_list = [i.source.title for i in d.entries]
+    title_list = [t.replace(' - '+s,'') for t,s in zip(n_title,source_name_list)] # 標題去除來源
+    #published_list = [i.published for i in d.entries] #日期
+    url_list = [i.link for i in d.entries]
+    embed = discord.Embed(title=('頭條新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x7e6487)
+    for title, url, source in zip(title_list[:5], url_list[:5], source_name_list[:5] ):
+        embed.add_field(name=title, value='['+source+']('+url+')', inline=False)
+    news_message = await ctx.send('呱YA日報 '+(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), embed=embed)
+    emojis = ['📰', '🎮','🌤']
+    for emoji in emojis:
+        await news_message.add_reaction(emoji)
+        
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.member.bot: # 機器人自身不算
+        return
+    channel = bot.get_channel(payload.channel_id)
+    news_message = await channel.fetch_message(payload.message_id)    
+    emoji = payload.emoji
+    
+    if news_message.content == '呱YA日報 '+(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"): # 只對當日新聞指令有效
+        
+        if emoji.name == "📰":
+            d = feedparser.parse('https://news.google.com/rss?hl=zh-TW&gl=TW&ceid=TW:zh-Hant')
+            n_title = [i.title for i in d.entries]
+            source_name_list = [i.source.title for i in d.entries]
+            title_list = [t.replace(' - '+s,'') for t,s in zip(n_title,source_name_list)]
+            url_list = [i.link for i in d.entries]
+            google_embed = discord.Embed(title=('頭條新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x7e6487)
+            for title, url, source in zip(title_list[:5], url_list[:5], source_name_list[:5] ):
+                google_embed.add_field(name=title, value='['+source+']('+url+')', inline=False)
+            await news_message.edit(embed=google_embed)
+
+        elif emoji.name == "🎮":
+            d = feedparser.parse('https://gnn.gamer.com.tw/rss.xml')
+            title_list = [i.title for i in d.entries]
+            url_list = [i.link for i in d.entries]
+            gnn_embed = discord.Embed(title=('巴哈姆特 GNN 新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x7e6487)
+            for title, url in zip(title_list[:5], url_list[:5]):
+                gnn_embed.add_field(name=title, value='[巴哈姆特]('+url+')', inline=False)
+            await news_message.edit(embed=gnn_embed)
+
+        elif emoji.name == "🌤":
+            # 取得台灣各縣市天氣
+            url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
+            r = requests.get(url)
+            data = r.json()['records']['locations'][0]['location']
+            weather_embed = discord.Embed(title=('新的一天! 大家早安( •̀ ω •́ )✧ '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x00d9ff)
+            for loc_num, loc_name in zip([12,9,20,17,6], ['基隆','臺北','臺中','嘉義','臺南']):
+                weather_data = data[loc_num]['weatherElement']
+                rain = weather_data[0]['time'][0]['elementValue'][0]['value']
+                temp = weather_data[1]['time'][0]['elementValue'][0]['value']
+                weat = weather_data[6]['time'][0]['elementValue'][0]['value']
+                weather_embed.add_field(name=loc_name ,value='☂'+rain+'%  🌡'+temp+'°C  ⛅'+weat, inline=False)
+            # 香港天氣
+            weat_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=flw&lang=tc').json()['forecastDesc'].split("。")[1]
+            forecast_hk = requests.get('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc').json()['weatherForecast'][0]
+            temp_hk = str(int((forecast_hk['forecastMaxtemp']['value']+forecast_hk['forecastMintemp']['value'])/2))
+            rain_hk = str(int((forecast_hk['forecastMaxrh']['value']+forecast_hk['forecastMinrh']['value'])/2))
+            weather_embed.add_field(name='香港' ,value='☂'+rain_hk+'%  🌡'+temp_hk+'°C  ⛅'+weat_hk, inline=False)
+            await news_message.edit(embed=weather_embed)
 
 
 # [指令] 全婆俠 :
@@ -510,7 +561,7 @@ async def help(ctx):
     embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]`", inline=False)
     embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `AMQ [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
-    embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `呱YA [問題]`", inline=False)
+    embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `呱YA [問題]`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`YamYA_info` \n `YamYA_invite` \n `help`", inline=False)
     embed.set_footer(text="更新日期： 2021/10/08                    - YamYA")
     await ctx.send(embed=embed)
