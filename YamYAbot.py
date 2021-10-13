@@ -201,6 +201,15 @@ async def 呱YA(ctx, *args):
             await asyncio.sleep(0.5)
         await ctx.send(resp[0])
         
+
+# [指令] 代替呱YA說話
+@bot.command()
+async def 呱YA說(ctx, *, arg):
+    #開發人員使用限定
+    if int(ctx.message.author.id)==378936265657286659 or int(ctx.message.author.id)==86721800393740288:
+        await ctx.message.delete()
+        await ctx.send(arg)
+        
     
 # [指令] 笑話 :
 @bot.command()
@@ -258,7 +267,7 @@ async def on_raw_reaction_add(payload):
             source_name_list = [i.source.title for i in d.entries]
             title_list = [t.replace(' - '+s,'') for t,s in zip(n_title,source_name_list)]
             url_list = [i.link for i in d.entries]
-            google_embed = discord.Embed(title=('頭條新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x7e6487)
+            google_embed = discord.Embed(title=('頭條新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x598ad9)
             for title, url, source in zip(title_list[:5], url_list[:5], source_name_list[:5] ):
                 google_embed.add_field(name=title, value='['+source+']('+url+')', inline=False)
             await news_message.edit(embed=google_embed)
@@ -267,7 +276,7 @@ async def on_raw_reaction_add(payload):
             d = feedparser.parse('https://gnn.gamer.com.tw/rss.xml')
             title_list = [i.title for i in d.entries]
             url_list = [i.link for i in d.entries]
-            gnn_embed = discord.Embed(title=('巴哈姆特 GNN 新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x7e6487)
+            gnn_embed = discord.Embed(title=('巴哈姆特 GNN 新聞'), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x598ad9)
             for title, url in zip(title_list[:5], url_list[:5]):
                 gnn_embed.add_field(name=title, value='[巴哈姆特]('+url+')', inline=False)
             await news_message.edit(embed=gnn_embed)
@@ -277,7 +286,7 @@ async def on_raw_reaction_add(payload):
             url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
             r = requests.get(url)
             data = r.json()['records']['locations'][0]['location']
-            weather_embed = discord.Embed(title=('新的一天! 大家早安( •̀ ω •́ )✧ '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x00d9ff)
+            weather_embed = discord.Embed(title=('天氣預報 '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x598ad9)
             for loc_num, loc_name in zip([12,9,20,17,6], ['基隆','臺北','臺中','嘉義','臺南']):
                 weather_data = data[loc_num]['weatherElement']
                 rain = weather_data[0]['time'][0]['elementValue'][0]['value']
@@ -551,7 +560,9 @@ async def 色色(ctx):
 # [指令] YamYA_invite : 邀請碼
 @bot.command()
 async def YamYA_invite(ctx):
-    await ctx.send("https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot")
+    embed=discord.Embed(title="喜歡認識osu麻婆、看動畫、亂道早安晚安的discord機器人", description="👾[GitHub](https://github.com/tommy9301122/YamYA_bot)   🍠[邀請連結](https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot)", color=0xcc8b00)
+    embed.set_author(name="呱YA一號", icon_url="https://cdn.discordapp.com/attachments/378910821234769942/854387552890519552/unknown.png")
+    await ctx.send(embed=embed)
     
     
 # [指令] help : 呱YA一號 指令與功能一覽
@@ -563,7 +574,6 @@ async def help(ctx):
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
     embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `呱YA [問題]`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`YamYA_info` \n `YamYA_invite` \n `help`", inline=False)
-    embed.set_footer(text="更新日期： 2021/10/08                    - YamYA")
     await ctx.send(embed=embed)
 
 
@@ -589,7 +599,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
-    ###################################################### 早安、晚安、owo、呱YA murmur
+    # 早安、晚安、owo
     if message.content.lower() == 'gm':
         await message.channel.send('gm (｡･∀･)ﾉﾞ')
         
@@ -598,18 +608,9 @@ async def on_message(message):
         
     if message.content.lower() == "owo":
         await message.channel.send(f"owo, {message.author.name}")
-        
-    
-    ###################################################### 代替呱YA講話
-    if message.content.lower().startswith('呱ya說 '):
-        repeat_mes = message.content.lower().split("呱ya說 ",1)[1]
-        
-        if int(message.author.id)==378936265657286659 or int(message.author.id)==86721800393740288:
-            await message.delete()
-            await message.channel.send(repeat_mes)
             
     
-    ###################################################### 訊息中包含 azgod (不分大小寫)
+    # 訊息中包含 azgod (不分大小寫)
     str_az = re.search(r'[a-zA-Z]{5}', message.content)
     if str_az:
         if str_az.group(0).lower() == 'azgod':
@@ -620,7 +621,7 @@ async def on_message(message):
                 await message.channel.send("AzRaeL isn't so great? Are you kidding me? When was the last time you saw a player can make storyboard that has beautiful special effect, amazing lyrics and geometry. Mapping with amazing patterns, perfect hitsounds and satisfying flow? AzRaeL makes mapping to another level, and we will be blessed if we ever see a taiwanese with his mapping skill and passion for the game again. Amateurre breaks records. Sotarks breaks records. AzRaeL breaks the rules. You can keep your statistics, I prefer the AzGoD.")
         
     
-    ###################################################### 其他彩蛋
+    # 其他彩蛋
     if message.content=='貼貼' or message.content=='cuddle' :
         embed=discord.Embed(title="ლ(╹◡╹ლ)")
         embed.set_image(url=nekos.img('cuddle'))
