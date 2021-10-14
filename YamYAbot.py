@@ -584,7 +584,7 @@ async def YamYA_invite(ctx):
 @bot.command()
 async def help(ctx):
     embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
-    embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]`", inline=False)
+    embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `BG [圖譜url]`", inline=False)
     embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `AMQ [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
     embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `呱YA [問題]`", inline=False)
