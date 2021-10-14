@@ -517,7 +517,6 @@ async def combo(ctx, *args):
         ar = ar.reshape(np.product(shape[:2]), shape[2]).astype(float)
         codes, dist = scipy.cluster.vq.kmeans(ar, color_num)
         
-        
         recommend_combo_color = ''
         
         color_hex = '{:02x}{:02x}{:02x}'.format(int(round(codes[0][0])), int(round(codes[0][1])), int(round(codes[0][2])))
@@ -534,6 +533,22 @@ async def combo(ctx, *args):
         embed.set_author(name='Combo Color Recommend', icon_url='https://raster.shields.io/badge/--'+color_hex+'.png')
         embed.set_thumbnail(url=img_url)
         await ctx.send(embed=embed)
+        
+        
+# [指令] BG色情守門員 : 檢查BG有沒有色色   
+@bot.command()
+async def BG(ctx, beatmap_url):
+    beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
+    bg_url = 'https://b.ppy.sh/thumb/'+beatmap_id+'l.jpg'
+    safe_detect_text = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_safe_detect_test',json={'input': bg_url}).text
+    
+    text_list = ['UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY']
+    output_list = ['?_?','🙂這很安全','🙂這很安全','😊這應該可以吧?','😳我覺得有點色','🤩太色了,我要去找GMT檢舉']
+    for match_text, output_text in zip(text_list, output_list):
+        if safe_detect_text == match_text:
+            embed=discord.Embed(title="BG色情守門員", description=output_text, color=0xff8a8a)
+            embed.set_thumbnail(url=bg_url)
+            await ctx.send(embed=embed)
 
 
 # [NSFW指令] 射了
