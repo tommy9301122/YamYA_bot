@@ -340,7 +340,7 @@ async def husbando(ctx, *args):
     
     
 # [指令] AMQ : 隨機選一首動畫OP/ED撥放
-@bot.command()
+@bot.command(aliases=['amq'])
 async def AMQ(ctx, *args):
     AniList_userName = ' '.join(args)
     query = '''
@@ -538,7 +538,7 @@ async def combo(ctx, *args):
         
         
 # [指令] BG色情守門員 : 檢查BG有沒有色色   
-@bot.command()
+@bot.command(aliases=['bg'])
 async def BG(ctx, beatmap_url):
     beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
     bg_url = 'https://b.ppy.sh/thumb/'+beatmap_id+'l.jpg'
@@ -555,7 +555,7 @@ async def BG(ctx, beatmap_url):
 
 # [NSFW指令] 射了
 @commands.is_nsfw()
-@bot.command()
+@bot.command(aliases=[cum])
 async def 射了(ctx):
     embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
     embed.set_image(url=nekos.img('cum'))
@@ -566,7 +566,7 @@ async def 射了(ctx):
 gif_class_list_nsfw = ['random_hentai_gif','nsfw_neko_gif','classic', 'bj','pussy','boobs','feetg','solog','pwankg']
 title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','鮑鮑','奶子ლ(́◉◞౪◟◉ლ)','🦵','ꈍ ꈍ','👆🖐🤞💦💦']
 @commands.is_nsfw()
-@bot.command()
+@bot.command(aliases=['hentai'])
 async def 色色(ctx):
     random_gif_nsfw = random.choice(list(zip(gif_class_list_nsfw, title_list_nsfw)))
     embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
@@ -586,11 +586,11 @@ async def YamYA_invite(ctx):
 @bot.command()
 async def help(ctx):
     embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
-    embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `BG [圖譜url]`", inline=False)
-    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `AMQ [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
+    embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
+    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
     embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `呱YA [問題]`", inline=False)
-    embed.add_field(name="⛏機器人相關", value="`YamYA_info` \n `YamYA_invite` \n `help`", inline=False)
+    embed.add_field(name="⛏機器人相關", value="`YamYA_invite` \n `help`", inline=False)
     await ctx.send(embed=embed)
 
 
