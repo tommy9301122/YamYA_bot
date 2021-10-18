@@ -7,18 +7,17 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```mapper [osu! user name]``` - statistics about osu mapper  
 ```icon bbcode [beatmap url]``` - the BBCode of the spread difficulty icon, that can be used for description  
 ```combo color [beatmap url]``` - recommend six combo colors based on the background image  
-```BG [beatmap url]``` - tell you is your background image hentai or not  
+```bg [beatmap url]``` - tell you is your background image hentai or not  
 
 #### 🍠ACG:
 ```waifu/husbando [AniList account]``` - say random charactor is waifu/husbando from your complete list  
-```AMQ [AniList account]``` - play random OP/ED video from your complete/watching list  
+```amq [AniList account]``` - play random OP/ED video from your complete/watching list  
 ```cuddle/hug/kiss/feed/nya/poke/baka/fuck``` - random gif  
-```色色/射了``` - NSFW gif (NSFW chennal only)
+```hentai/cum``` - NSFW gif (NSFW chennal only)
 
 #### 🍠Others:
 ```午餐吃什麼 [中式/台式/日式/美式] [地區]``` - decide what to eat  
 ```笑話``` - random joke from ptt  
-```gm/gn``` - good morning/good night  
 ```呱YA [question]``` - chat with bot    
 ```呱YA``` - easter eggs or something that i want to say  
 
