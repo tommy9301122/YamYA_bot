@@ -555,7 +555,7 @@ async def BG(ctx, beatmap_url):
 
 # [NSFW指令] 射了
 @commands.is_nsfw()
-@bot.command(aliases=[cum])
+@bot.command(aliases=['cum'])
 async def 射了(ctx):
     embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
     embed.set_image(url=nekos.img('cum'))
