@@ -134,7 +134,7 @@ async def broadcast():
     
     # wysi
     utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
-    if utc8_time == '0727' and random.randint(1,7) == 1: # 時間 且機率發生
+    if utc8_time == '0727' and random.randint(1,10) <= 3: # 時間 且機率發生
         channel = bot.get_channel(842463449467453491) # 指定頻道 (zyoi fan club)
         await channel.send('wysi')
 
@@ -165,23 +165,25 @@ async def on_member_join(member):
         await channel.send(f"{member.mention} 進來後請把暱稱改成本名")
         
         
-# [指令] YamYA_info : 取得呱YA所有所在伺服器列表(名稱、人數)
+# [指令] YamYA_info : 取得呱YA所有所在伺服器列表
 @bot.command()
 async def YamYA_info(ctx):
-    guilds = bot.guilds
-    all_server_list = [guild.name for guild in guilds]
-    member_count_list = [guild.member_count for guild in guilds]
-    
-    all_server_count = len(all_server_list)
-    all_member_count = sum(member_count_list)
-    
-    description_main = ''
-    for server_name, member_number in zip(all_server_list, member_count_list):
-        description_main = description_main+server_name+'    '+str(member_number)+'\n'
-    # 卡片
-    embed = discord.Embed(title='YamYA Bot Join Server Info', description=description_main)
-    embed.set_footer(text='> 伺服器數量:'+str(all_server_count)+'  總人數:'+str(all_member_count))
-    await ctx.send(embed=embed)
+    # 開發限定使用
+    if int(ctx.message.author.id)==378936265657286659:
+        guilds = bot.guilds
+        all_server_list = [guild.name for guild in guilds]
+        member_count_list = [guild.member_count for guild in guilds]
+
+        all_server_count = len(all_server_list)
+        all_member_count = sum(member_count_list)
+
+        description_main = ''
+        for server_name, member_number in zip(all_server_list, member_count_list):
+            description_main = description_main+server_name+'\n'
+        # 卡片
+        embed = discord.Embed(title='YamYA Bot Join Server Info', description=description_main)
+        embed.set_footer(text='> 伺服器數量:'+str(all_server_count)+'  總人數:'+str(all_member_count))
+        await ctx.send(embed=embed)
     
     
 # [指令] 呱YA : 和呱YA聊天
@@ -247,7 +249,7 @@ async def 新聞(ctx):
     for title, url, source in zip(title_list[:5], url_list[:5], source_name_list[:5] ):
         embed.add_field(name=title, value='['+source+']('+url+')', inline=False)
     news_message = await ctx.send('呱YA日報 '+(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), embed=embed)
-    emojis = ['📰', '🎮','🌤']
+    emojis = ['📰', '🎮', '🌤']
     for emoji in emojis:
         await news_message.add_reaction(emoji)
         
@@ -413,7 +415,7 @@ async def AMQ(ctx, *args):
         
         
 # [指令] 神麻婆 : 神麻婆卡片
-@bot.command()
+@bot.command(aliases=['mapper'])
 async def 神麻婆(ctx, *args):
     try:
         mapper = ' '.join(args)

@@ -4,7 +4,7 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 -----------
 ### Command
 #### 🍠osu!:
-```神麻婆 [osu! user name]``` - statistics about osu mapper  
+```mapper [osu! user name]``` - statistics about osu mapper  
 ```icon bbcode [beatmap url]``` - the BBCode of the spread difficulty icon, that can be used for description  
 ```combo color [beatmap url]``` - recommend six combo colors based on the background image  
 ```BG [beatmap url]``` - tell you is your background image hentai or not  
