@@ -211,7 +211,7 @@ async def 呱YA說(ctx, *, arg):
     if int(ctx.message.author.id)==378936265657286659 or int(ctx.message.author.id)==86721800393740288:
         await ctx.message.delete()
         await ctx.send(arg)
-        
+
     
 # [指令] 笑話 :
 @bot.command()
@@ -302,6 +302,66 @@ async def on_raw_reaction_add(payload):
             rain_hk = str(int((forecast_hk['forecastMaxrh']['value']+forecast_hk['forecastMinrh']['value'])/2))
             weather_embed.add_field(name='香港' ,value='☂'+rain_hk+'%  🌡'+temp_hk+'°C  ⛅'+weat_hk, inline=False)
             await news_message.edit(embed=weather_embed)
+
+
+# [指令] 午/晚餐吃什麼:
+@bot.command(aliases=['午餐吃什麼'])
+async def 晚餐吃什麼(ctx, *args):
+    ending_list = ['怎麼樣?','好吃',' 98','?','']
+    # 沒有選類別的話就全部隨機: 吃土 2%  中式/台式 49%  日式/美式/意式 49%
+    if len(args)==0:
+        eat_dust = random.randint(1, 100)
+        if eat_dust <= 2:
+            await ctx.send('還是吃土?')
+        else:
+            eat_class = random.randint(1, 2)
+            if eat_class == 1:
+                await ctx.send(random.choice(food_c)+random.choice(ending_list))
+            if eat_class == 2:
+                await ctx.send(random.choice(food_j+food_a)+random.choice(ending_list))
+    # 只輸入類別
+    elif len(args)==1 and '式' in args[0]:
+        food_class = args[0]
+        if food_class=='中式' or food_class=='台式':
+            await ctx.send(random.choice(food_c)+random.choice(ending_list))
+        elif food_class=='日式' :
+            await ctx.send(random.choice(food_j)+random.choice(ending_list))
+        elif food_class=='美式' :
+            await ctx.send(random.choice(food_a)+random.choice(ending_list))
+        else:
+            await ctx.send('我不知道'+food_class+'料理有哪些，請輸入中/台式、日式或美式 º﹃º')
+    # 只輸入地點
+    elif len(args)==1 and '式' not in args[0]:
+        search_food = random.choice(food_j+food_a+food_c)
+        search_place = args[0]
+        try:
+            restaurant = googlemaps_search_food(search_food, search_place)
+            embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
+            embed.set_author(name = search_food+random.choice(ending_list))
+            await ctx.send(embed=embed)
+        except:
+            await ctx.send('在'+search_place+'找不到適合的'+search_food+'餐廳，請再重新輸入一遍或換個地點名稱><')
+    # 輸入類別和地點
+    elif len(args)==2 and ('中式' in args[0] or '台式' in args[0] or '日式' in args[0] or '美式' in args[0]):
+        food_class = args[0]
+        search_place = args[1]
+        if food_class=='中式' or food_class=='台式':
+            search_food = random.choice(food_c)
+        elif food_class=='日式' :
+            search_food = random.choice(food_j)
+        elif food_class=='美式' :
+            search_food = random.choice(food_a)
+        try:
+            restaurant = googlemaps_search_food(search_food, search_place)
+            embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
+            embed.set_author(name = search_food+random.choice(ending_list))
+            await ctx.send(embed=embed)
+        
+        except:
+            await ctx.send('在'+search_place+'找不到適合的'+search_food+'餐廳，請再重新輸入一遍或換個地點名稱><')
+    # 格式打錯
+    else:
+        await ctx.send('確認一下指令是否正確: ```午餐吃什麼 [中式/台式/日式/美式] [地點]``` 參數皆可省略')
 
 
 # [指令] 全婆俠 :
@@ -412,8 +472,8 @@ async def AMQ(ctx, *args):
             break
         except:
             pass
-        
-        
+
+
 # [指令] 神麻婆 : 神麻婆卡片
 @bot.command(aliases=['mapper'])
 async def 神麻婆(ctx, *args):
@@ -476,7 +536,7 @@ async def 神麻婆(ctx, *args):
             await ctx.send(embed=embed)
     except:
         await ctx.send('我找不到這位神麻婆的圖;w;')
-            
+
 
 # [指令] icon bbcode: 輸出圖譜新版 icon bbcode
 @bot.command()
@@ -501,8 +561,8 @@ async def icon(ctx, *args):
             await ctx.send(print_str)
         except:
             await ctx.send('我找不到這張圖;w;')
-            
-            
+
+
 # [指令] combo color : 根據BG推薦 combo color
 @bot.command()
 async def combo(ctx, *args):
@@ -535,8 +595,8 @@ async def combo(ctx, *args):
         embed.set_author(name='Combo Color Recommend', icon_url='https://raster.shields.io/badge/--'+color_hex+'.png')
         embed.set_thumbnail(url=img_url)
         await ctx.send(embed=embed)
-        
-        
+
+
 # [指令] BG色情守門員 : 檢查BG有沒有色色   
 @bot.command(aliases=['bg'])
 async def BG(ctx, beatmap_url):
@@ -551,6 +611,49 @@ async def BG(ctx, beatmap_url):
             embed=discord.Embed(title="BG色情守門員", description=output_text, color=0xff8a8a)
             embed.set_thumbnail(url=bg_url)
             await ctx.send(embed=embed)
+
+
+# [指令] 彩蛋GIF
+@bot.command(aliases=['cuddle'])
+async def 貼貼(ctx):
+    embed=discord.Embed(title="ლ(╹◡╹ლ)", color=0xd8d097)
+    embed.set_image(url=nekos.img('cuddle'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['hug'])
+async def 抱抱(ctx):
+    embed=discord.Embed(title="(つ´ω`)つ", color=0xd8d097)
+    embed.set_image(url=nekos.img('hug'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['kiss'])
+async def 親親(ctx):
+    embed=discord.Embed(title="( ˘ ³˘)♥", color=0xd8d097)
+    embed.set_image(url=nekos.img('kiss'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['feed me','feed'])
+async def 餵我(ctx):
+    embed=discord.Embed(title="ψ(｀∇´)ψ", color=0xd8d097)
+    embed.set_image(url=nekos.img('feed'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['nya'])
+async def 喵(ctx):
+    embed=discord.Embed(title="ο(=•ω＜=)ρ⌒☆", color=0xd8d097)
+    embed.set_image(url=nekos.img('ngif'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['poke'])
+async def 戳(ctx):
+    embed=discord.Embed(title="戳~", color=0xd8d097)
+    embed.set_image(url=nekos.img('poke'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['baka'])
+async def 笨蛋(ctx):
+    embed=discord.Embed(title="バカ~", color=0xd8d097)
+    embed.set_image(url=nekos.img('baka'))
+    await ctx.send(embed=embed)
+@bot.command(aliases=['幹你娘','fuck'])
+async def 幹(ctx):
+    embed=discord.Embed(title="-`д´-/", color=0xd8d097)
+    embed.set_image(url=nekos.img('slap'))
+    await ctx.send(embed=embed)
 
 
 # [NSFW指令] 射了
@@ -607,13 +710,11 @@ async def on_command_error(ctx, error):
         return await ctx.send(embed=embed)
     raise error
     
-    
 
 # on_message
 @bot.event
 async def on_message(message):
-    #排除自己的訊息，避免陷入無限循環
-    if message.author == bot.user:
+    if message.author == bot.user: #排除自己的訊息，避免陷入無限循環
         return
     
     # 早安、晚安、owo
@@ -625,8 +726,7 @@ async def on_message(message):
         
     if message.content.lower() == "owo":
         await message.channel.send(f"owo, {message.author.name}")
-            
-    
+
     # 訊息中包含 azgod (不分大小寫)
     str_az = re.search(r'[a-zA-Z]{5}', message.content)
     if str_az:
@@ -636,114 +736,7 @@ async def on_message(message):
                 await message.channel.send("https://i.imgur.com/PT5gInL.png")
             if k == 1:
                 await message.channel.send("AzRaeL isn't so great? Are you kidding me? When was the last time you saw a player can make storyboard that has beautiful special effect, amazing lyrics and geometry. Mapping with amazing patterns, perfect hitsounds and satisfying flow? AzRaeL makes mapping to another level, and we will be blessed if we ever see a taiwanese with his mapping skill and passion for the game again. Amateurre breaks records. Sotarks breaks records. AzRaeL breaks the rules. You can keep your statistics, I prefer the AzGoD.")
-        
-    
-    # 其他彩蛋
-    if message.content=='貼貼' or message.content=='cuddle' :
-        embed=discord.Embed(title="ლ(╹◡╹ლ)")
-        embed.set_image(url=nekos.img('cuddle'))
-        await message.channel.send(embed=embed)
-        
-    if message.content=='抱抱' or message.content=='hug' :
-        embed=discord.Embed(title="(つ´ω`)つ")
-        embed.set_image(url=nekos.img('hug'))
-        await message.channel.send(embed=embed)
-        
-    if message.content=='親親' or message.content=='kiss' :
-        embed=discord.Embed(title="( ˘ ³˘)♥")
-        embed.set_image(url=nekos.img('kiss'))
-        await message.channel.send(embed=embed)
-        
-    if message.content=='餵我' or message.content=='feed me' :
-        embed=discord.Embed(title="ψ(｀∇´)ψ")
-        embed.set_image(url=nekos.img('feed'))
-        await message.channel.send(embed=embed)
-        
-    if message.content=='喵' or message.content=='nya' :
-        embed=discord.Embed(title="喵? ο(=•ω＜=)ρ⌒☆")
-        embed.set_image(url=nekos.img('ngif'))
-        await message.channel.send(embed=embed)
-        
-    if message.content=='戳' or message.content=='poke' :
-        embed=discord.Embed(title="戳~")
-        embed.set_image(url=nekos.img('poke'))
-        await message.channel.send(embed=embed)
-        
-    if message.content=='笨蛋' or message.content=='baka' :
-        embed=discord.Embed(title="バカ")
-        embed.set_image(url=nekos.img('baka'))
-        await message.channel.send(embed=embed)
 
-    bad_word_list = ['幹','靠北','幹你娘','fuck you 呱ya','fuck 呱ya','fuck']
-    if message.content.lower() in bad_word_list:
-        await message.channel.send(nekos.img('slap'))            
-                
-    
-    ####################################################### 午餐吃什麼?
-    #結尾用語
-    ending_list = ['怎麼樣?','好吃',' 98','?','']
-    
-    # 沒有選類別的話就全部隨機: 吃土 2%  中式/台式 50%  日式/美式/意式 50%   
-    if message.content=='午餐吃什麼' or message.content=='晚餐吃什麼' :
-        eat_dust = random.randint(1, 100)
-        if eat_dust <= 2:
-            await message.channel.send('還是吃土?')
-        else:
-            eat_class = random.randint(1, 2)
-            if eat_class == 1:
-                await message.channel.send(random.choice(food_c)+random.choice(ending_list))
-            if eat_class == 2:
-                await message.channel.send(random.choice(food_j+food_a)+random.choice(ending_list))
-                
-    # 有選類別:
-    if message.content.startswith('午餐吃什麼 ') or message.content.startswith('晚餐吃什麼 ') :
-        comm = message.content.split(' ')
-
-        # 只輸入類別
-        if len(comm)==2 and '式' in comm[1]:
-            food_class = comm[1]
-            if food_class=='中式' or food_class=='台式':
-                await message.channel.send(random.choice(food_c)+random.choice(ending_list))
-            elif food_class=='日式' :
-                await message.channel.send(random.choice(food_j)+random.choice(ending_list))
-            elif food_class=='美式' :
-                await message.channel.send(random.choice(food_a)+random.choice(ending_list))
-            else:
-                pass
-
-        # 只輸入地點
-        if len(comm)==2 and '式' not in comm[1]:
-            search_food = random.choice(food_j+food_a+food_c)
-            search_place = comm[1]
-            try:
-                restaurant = googlemaps_search_food(search_food, search_place)
-                embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
-                embed.set_author(name = search_food+random.choice(ending_list))
-                await message.channel.send(embed=embed)
-            except:
-                pass
-            
-        # 輸入類別和地點
-        if len(comm)==3 and '式' in comm[1]:
-            food_class = comm[1]
-            search_place = comm[2]
-            if food_class=='中式' or food_class=='台式':
-                search_food = random.choice(food_c)
-            elif food_class=='日式' :
-                search_food = random.choice(food_j)
-            elif food_class=='美式' :
-                search_food = random.choice(food_a)
-            else:
-                await message.channel.send('格式好像錯了 º﹃º')
-            try:
-                restaurant = googlemaps_search_food(search_food, search_place)
-                embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
-                embed.set_author(name = search_food+random.choice(ending_list))
-                await message.channel.send(embed=embed)
-            except:
-                pass
-            
-            
     await bot.process_commands(message)
     
 bot.run(Discord_token)
