@@ -18,6 +18,8 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 #### 🍠Others:
 ```午餐吃什麼 [中式/台式/日式/美式] [地區]``` - decide what to eat  
 ```笑話``` - random joke from ptt  
+```新聞``` - Taiwan News and weather forecast  
+```translate [text]``` - translate  
 ```呱YA [question]``` - chat with bot    
 ```呱YA``` - easter eggs or something that i want to say  
 

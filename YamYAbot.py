@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import nekos
 import googlemaps
+from googletrans import Translator
 
 import discord
 from discord.ext import commands, tasks
@@ -364,6 +365,28 @@ async def 晚餐吃什麼(ctx, *args):
         await ctx.send('確認一下指令是否正確: ```午餐吃什麼 [中式/台式/日式/美式] [地點]``` 參數皆可省略')
 
 
+# [指令] 翻譯 :
+@bot.command(aliases=['translate'])
+async def 翻譯(ctx, *args):
+    input_text = ' '.join(args)
+    
+    translator = Translator()
+    us_trans = translator.translate(input_text, dest='en').text
+    tw_trans = translator.translate(input_text, dest='zh-tw').text
+    kr_trans = translator.translate(input_text, dest='ko').text
+    jp_trans = translator.translate(input_text, dest='ja').text
+    cn_trans = translator.translate(input_text, dest='zh-cn').text
+    
+    trans_list = [us_trans, tw_trans, kr_trans, jp_trans, cn_trans]
+    output_text = ''
+    for trans in trans_list:
+        if input_text!=trans:
+            output_text = output_text+trans+'\n'
+            
+    embed=discord.Embed(title='🌏 '+input_text, description=output_text, color=0x3884ff)
+    await ctx.send(embed=embed)
+
+
 # [指令] 全婆俠 :
 @bot.command()
 async def 全婆俠(ctx, *args):
@@ -686,13 +709,13 @@ async def YamYA_invite(ctx):
     
     
 # [指令] help : 呱YA一號 指令與功能一覽
-@bot.command()
+@bot.command(aliases=['YamYA_help'])
 async def help(ctx):
     embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
     embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
     embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
-    embed.add_field(name="🍜其它 (參數皆可不加)", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `呱YA [問題]`", inline=False)
+    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `翻譯 [想翻譯的文字]` \n `呱YA [問題]`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`YamYA_invite` \n `help`", inline=False)
     await ctx.send(embed=embed)
 
