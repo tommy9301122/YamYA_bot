@@ -132,7 +132,6 @@ def get_AniList_character(AniList_userName, character_gender_input):
 # [自動推播] 
 @tasks.loop(seconds=60)
 async def broadcast():
-    
     # wysi
     utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
     if utc8_time == '0727' and random.randint(1,10) <= 3: # 時間 且機率發生
@@ -140,15 +139,20 @@ async def broadcast():
         await channel.send('wysi')
 
 
+# [自動更新狀態]
+@tasks.loop(seconds=15)
+async def activity_auto_change():
+    status_w = discord.Status.online
+    activity_w = discord.Activity(type=discord.ActivityType.playing, name=random.choice(YamYABot_murmur))
+    await bot.change_presence(status= status_w, activity=activity_w)
+
+
 # [啟動]
 @bot.event
 async def on_ready():
     print('目前登入身份：', bot.user)
-    
-    status_w = discord.Status.online  #Status : online（上線）,offline（下線）,idle（閒置）,dnd（請勿打擾）,invisible（隱身）
-    activity_w = discord.Activity(type=discord.ActivityType.playing, name="YamYA我把拔")  #type : playing（遊玩中）、streaming（直撥中）、listening（聆聽中）、watching（觀看中）、custom（自定義）
     broadcast.start() # 推播
-    await bot.change_presence(status= status_w, activity=activity_w)
+    activity_auto_change.start() #自動更新狀態
     
     
 # [新進成員] (依伺服器)
@@ -628,7 +632,7 @@ async def BG(ctx, beatmap_url):
     safe_detect_text = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_safe_detect_test',json={'input': bg_url}).text
     
     text_list = ['UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY']
-    output_list = ['?_?','🙂這很安全','🙂這很安全','😊這應該可以吧?','😳我覺得有點色','🤩太色了,我要去找GMT檢舉']
+    output_list = ['?_?','🙂Nice bg!','🙂Nice bg!','😊Nice bg!','😳我覺得有點色','🤩太色了,我要去找GMT檢舉']
     for match_text, output_text in zip(text_list, output_list):
         if safe_detect_text == match_text:
             embed=discord.Embed(title="BG色情守門員", description=output_text, color=0xff8a8a)
