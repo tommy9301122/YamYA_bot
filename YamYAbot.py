@@ -686,12 +686,9 @@ async def 幹(ctx):
 
 # [萬聖節指令]
 @bot.command(aliases=['Halloween','halloween','HappyHalloween'])
-async def 萬聖節快樂(ctx, *, member: discord.Member = None):
-    if not member:
-        member = ctx.message.author
-        
+async def 萬聖節快樂(ctx):
     mask = Image.open('mask.png')#.convert('RGB')
-    response = requests.get(member.avatar_url)
+    response = requests.get(ctx.message.author.avatar_url)
     im = Image.open(BytesIO(response.content))
 
     output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
@@ -703,7 +700,7 @@ async def 萬聖節快樂(ctx, *, member: discord.Member = None):
         image_binary.seek(0)
         
         #await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
-        await ctx.send('🎃 '+member.mention+' Happy Halloween!! 🎃')
+        await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
         await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
