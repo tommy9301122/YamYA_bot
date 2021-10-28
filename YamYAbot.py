@@ -689,7 +689,7 @@ async def 幹(ctx):
 async def 萬聖節快樂(ctx):
     mask = Image.open('mask.png')#.convert('RGB')
     
-    asset = ctx.author.avatar_url_as(size=100)
+    asset = ctx.author.avatar_url_as(size=128)
     data = BytesIO(await asset.read())
     im = Image.open(data)
     #response = requests.get(ctx.message.author.avatar_url)
