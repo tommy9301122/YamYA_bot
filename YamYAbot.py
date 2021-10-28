@@ -701,7 +701,7 @@ async def 萬聖節快樂(ctx):
         
         #await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
         await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
-        await ctx.send(file=discord.File(BytesIO(image_binary.encode()), filename='image.png'))
+        await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
 # [NSFW指令] 射了
