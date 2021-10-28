@@ -2,7 +2,8 @@ from PTT_jokes import PttJokes
 from bot_data import food_a, food_j, food_c, YamYABot_murmur
 import feedparser
 from colour import Color
-from PIL import Image
+from PIL import Image, ImageOps
+from io import BytesIO
 import scipy
 import scipy.cluster
 import os
@@ -681,6 +682,29 @@ async def 幹(ctx):
     embed=discord.Embed(title="-`д´-/", color=0xd8d097)
     embed.set_image(url=nekos.img('slap'))
     await ctx.send(embed=embed)
+
+
+# [萬聖節指令]
+@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
+async def 萬聖節快樂(ctx, *, member: discord.Member = None):
+    if not member:
+        member = ctx.message.author
+        
+    mask = Image.open('mask.png')#.convert('RGB')
+    response = requests.get(member.avatar_url)
+    im = Image.open(BytesIO(response.content))
+
+    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
+    output = output.convert('RGB')
+    output.paste(mask, (0, 0), mask)
+    
+    with BytesIO() as image_binary:
+        output.save(image_binary, 'PNG')
+        image_binary.seek(0)
+        
+        #await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
+        await ctx.send('🎃 '+member.mention+' Happy Halloween!! 🎃')
+        await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
 # [NSFW指令] 射了
