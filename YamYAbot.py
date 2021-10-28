@@ -687,7 +687,7 @@ async def 幹(ctx):
 # [萬聖節指令]
 @bot.command(aliases=['Halloween','halloween','HappyHalloween'])
 async def 萬聖節快樂(ctx):
-    mask = Image.open('mask.png')#.convert('RGB')
+    mask = Image.open(BytesIO('mask.png'))#.convert('RGB')
     response = requests.get(ctx.message.author.avatar_url)
     im = Image.open(BytesIO(response.content))
 
