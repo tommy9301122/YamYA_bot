@@ -684,37 +684,28 @@ async def 幹(ctx):
     await ctx.send(embed=embed)
 
 
-# [萬聖節指令]
 @bot.command(aliases=['Halloween','halloween','HappyHalloween'])
 async def 萬聖節快樂(ctx):
+    
     # 特效圖
     mask = Image.open('mask.png')#.convert('RGB')
     
-    # 大頭貼
-    #asset = ctx.author.avatar_url_as(size=128)
-    #data = BytesIO(await asset.read())
-    #data.seek(0)
-    #im = Image.open(data)
-    
-    #response = requests.get(ctx.message.author.avatar_url)
-    #im = Image.open(BytesIO(response.content))
-    
-    url = ctx.message.author.avatar_url
-    im = Image.open(requests.get(url, stream=True).raw)
-    print('大頭貼讀取 成功')
-    
+    # 大頭貼 方法二
+    url = ctx.author.avatar_url
+    print(url)
+    data = requests.get(url)
+    im = Image.open(BytesIO(data.content))
+
     # 組合
-    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))  # 將兩張圖片大小調整一至
-    output = output.convert('RGB')   # RGB
-    output.paste(mask, (0, 0), mask)  # 貼一起
-    print('組合成功')
+    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
+    output = output.convert('RGB')
+    output.paste(mask, (0, 0), mask)
     
     # 存為BytesIO
     image_binary = BytesIO() 
     output.save(image_binary, 'PNG')
     image_binary.seek(0)
-    print('成功!!')
-    
+
     # 輸出
     await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
     await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
