@@ -689,18 +689,19 @@ async def 幹(ctx):
 async def 萬聖節快樂(ctx):
     # 特效圖
     mask = Image.open('mask.png')#.convert('RGB')
-    print('mask 讀取成功')
     
     # 大頭貼
-    asset = ctx.author.avatar_url_as(size=128)
-    print('asset成功')
-    data = BytesIO(await asset.read())
-    print('BytesIO 讀取成功')
-    data.seek(0)
-    im = Image.open(data)
-    print('BytesIO open 成功')
+    #asset = ctx.author.avatar_url_as(size=128)
+    #data = BytesIO(await asset.read())
+    #data.seek(0)
+    #im = Image.open(data)
+    
     #response = requests.get(ctx.message.author.avatar_url)
     #im = Image.open(BytesIO(response.content))
+    
+    url = ctx.message.author.avatar_url
+    im = Image.open(requests.get(url, stream=True).raw)
+    print('大頭貼讀取 成功')
     
     # 組合
     output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))  # 將兩張圖片大小調整一至
