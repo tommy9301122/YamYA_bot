@@ -696,6 +696,7 @@ async def 萬聖節快樂(ctx):
     print('asset成功')
     data = BytesIO(await asset.read())
     print('BytesIO 讀取成功')
+    data.seek(0)
     im = Image.open(data)
     print('BytesIO open 成功')
     #response = requests.get(ctx.message.author.avatar_url)
