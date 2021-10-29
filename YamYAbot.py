@@ -687,25 +687,35 @@ async def 幹(ctx):
 # [萬聖節指令]
 @bot.command(aliases=['Halloween','halloween','HappyHalloween'])
 async def 萬聖節快樂(ctx):
+    # 特效圖
     mask = Image.open('mask.png')#.convert('RGB')
+    print('mask 讀取成功')
     
+    # 大頭貼
     asset = ctx.author.avatar_url_as(size=128)
+    print('asset成功')
     data = BytesIO(await asset.read())
+    print('BytesIO 讀取成功')
     im = Image.open(data)
+    print('BytesIO open 成功')
     #response = requests.get(ctx.message.author.avatar_url)
     #im = Image.open(BytesIO(response.content))
-
-    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
-    output = output.convert('RGB')
-    output.paste(mask, (0, 0), mask)
     
-    with BytesIO() as image_binary:
-        output.save(image_binary, 'PNG')
-        image_binary.seek(0)
-        
-        #await message.channel.send(file=discord.File(fp=image_binary, filename='image.png'))
-        await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
-        await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+    # 組合
+    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))  # 將兩張圖片大小調整一至
+    output = output.convert('RGB')   # RGB
+    output.paste(mask, (0, 0), mask)  # 貼一起
+    print('組合成功')
+    
+    # 存為BytesIO
+    image_binary = BytesIO() 
+    output.save(image_binary, 'PNG')
+    image_binary.seek(0)
+    print('成功!!')
+    
+    # 輸出
+    await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
+    await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
 # [NSFW指令] 射了
