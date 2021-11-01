@@ -684,25 +684,25 @@ async def 幹(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
-async def 萬聖節快樂(ctx):
-    # 特效圖
-    mask = Image.open('mask.png')#.convert('RGB')
-    # 大頭貼
-    url = ctx.author.avatar_url
-    data = requests.get(url)
-    im = Image.open(BytesIO(data.content))
-    # 組合
-    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
-    output = output.convert('RGB')
-    output.paste(mask, (0, 0), mask)
-    # 存為BytesIO
-    image_binary = BytesIO() 
-    output.save(image_binary, 'PNG')
-    image_binary.seek(0)
-    # 輸出
-    await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
-    await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+#@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
+#async def 萬聖節快樂(ctx):
+#    # 特效圖
+#    mask = Image.open('halloween_mask.png')#.convert('RGB')
+#    # 大頭貼
+#    url = ctx.author.avatar_url
+#    data = requests.get(url)
+#    im = Image.open(BytesIO(data.content))
+#    # 組合
+#    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
+#    output = output.convert('RGB')
+#    output.paste(mask, (0, 0), mask)
+#    # 存為BytesIO
+#    image_binary = BytesIO() 
+#    output.save(image_binary, 'PNG')
+#    image_binary.seek(0)
+#    # 輸出
+#    await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
+#    await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
 # [NSFW指令] 射了
