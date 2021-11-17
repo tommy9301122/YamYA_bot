@@ -690,14 +690,14 @@ async def 幹(ctx):
 async def 鯊鯊(ctx):
     # 取得頁數
     res = requests.get('https://www.zerochan.net/Gawr+Gura', verify=False)
-    soup = BeautifulSoup(res.text,'lxml')
+    soup = BeautifulSoup(res.text,"html.parser")
     page_str = soup.find(class_="pagination").find(text=True)
     page = int(re.search('of ([0-9]*)\t',page_str).group(1))
 
     # 取得隨機一頁的隨機一張圖片
     url = []
     res = requests.get('https://www.zerochan.net/Gawr+Gura?p='+str(random.randint(1,page)), verify=False)
-    soup = BeautifulSoup(res.text,'lxml')
+    soup = BeautifulSoup(res.text,"html.parser")
     for ele in soup.find_all(class_=" "):
         for i in ele.find_all('img'):
             url.append(i.get('src'))
