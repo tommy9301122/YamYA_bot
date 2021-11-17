@@ -707,6 +707,30 @@ async def 鯊鯊(ctx):
     embed=discord.Embed(title='🦐 Gawr Gura 🦐', color=0x5cb8ff)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
+    
+    
+# [指令] 璐娜 :
+@bot.command(aliases=['Luna','luna'])
+async def 璐娜(ctx):
+    # 取得頁數
+    res = requests.get('https://www.zerochan.net/Himemori+Luna', verify=False)
+    soup = BeautifulSoup(res.text,"html.parser")
+    page_str = soup.find(class_="pagination").find(text=True)
+    page = int(re.search('of ([0-9]*)\t',page_str).group(1))
+
+    # 取得隨機一頁的隨機一張圖片
+    url = []
+    res = requests.get('https://www.zerochan.net/Himemori+Luna?p='+str(random.randint(1,page)), verify=False)
+    soup = BeautifulSoup(res.text,"html.parser")
+    for ele in soup.find_all(id="content"):
+        for i in ele.find_all('img'):
+            url.append(i.get('src'))
+    img_url_list = [i for i in url if i != 'https://static.zerochan.net/download.png']
+    img_url = random.choice(img_url_list)
+            
+    embed=discord.Embed(title='🍬 Himemori Luna 🍬', color=0xffadd1)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
 
 
 #@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
