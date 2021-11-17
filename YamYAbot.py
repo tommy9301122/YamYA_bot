@@ -698,7 +698,7 @@ async def 鯊鯊(ctx):
     url = []
     res = requests.get('https://www.zerochan.net/Gawr+Gura?p='+str(random.randint(1,page)), verify=False)
     soup = BeautifulSoup(res.text,"html.parser")
-    for ele in soup.find_all(class_=" "):
+    for ele in soup.find_all(id="content"):
         for i in ele.find_all('img'):
             url.append(i.get('src'))
     img_url_list = [i for i in url if i != 'https://static.zerochan.net/download.png']
