@@ -12,6 +12,8 @@ from datetime import date
 import re
 import random
 import requests
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
