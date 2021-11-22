@@ -137,8 +137,8 @@ def get_ani_image(search_name):
     soup = BeautifulSoup(res.text,"html.parser")
     page_str = soup.find(class_="pagination").find(text=True)
     page = int(re.search('of ([0-9]*)\t',page_str).group(1))
-    if page>30:
-        page=30
+    if page>20:
+        page=20
     url = []
     res = requests.get('https://www.zerochan.net/'+search_name+'?p='+str(random.randint(1,page)), verify=False)
     soup = BeautifulSoup(res.text,"html.parser")
@@ -725,6 +725,14 @@ async def 璐娜(ctx):
 async def 佩克拉(ctx):
     img_url = get_ani_image('Usada+Pekora')
     embed=discord.Embed(title='👯 Usada Pekora 👯', color=0xffffff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+    
+# [指令] 拉米 :
+@bot.command(aliases=['Lamy','lamy'])
+async def 拉米(ctx):
+    img_url = get_ani_image('Yukihana+Lamy')
+    embed=discord.Embed(title='☃ Yukihana Lamy ☃', color=0x8afdff)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
 
