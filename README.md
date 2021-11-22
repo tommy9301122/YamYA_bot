@@ -13,6 +13,7 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```waifu/husbando [AniList account]``` - say random charactor is waifu/husbando from your complete list  
 ```amq [AniList account]``` - play random OP/ED video from your complete/watching list  
 ```cuddle/hug/kiss/feed/nya/poke/baka/fuck``` - random gif  
+```Gura/Luna/Peko``` - randon vtuber image  
 ```hentai/cum``` - NSFW gif (NSFW chennal only)
 
 #### 🍠Others:

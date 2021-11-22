@@ -130,6 +130,23 @@ def get_AniList_character(AniList_userName, character_gender_input):
     character_image = df_character.image.values[0]
     
     return character_name, character_image
+    
+# 取得 zerochan 圖片
+def get_ani_image(search_name):
+    res = requests.get('https://www.zerochan.net/'+search_name, verify=False)
+    soup = BeautifulSoup(res.text,"html.parser")
+    page_str = soup.find(class_="pagination").find(text=True)
+    page = int(re.search('of ([0-9]*)\t',page_str).group(1))
+    if page>30:
+        page=30
+    url = []
+    res = requests.get('https://www.zerochan.net/'+search_name+'?p='+str(random.randint(1,page)), verify=False)
+    soup = BeautifulSoup(res.text,"html.parser")
+    for ele in soup.find_all(id="content"):
+        for i in ele.find_all('img'):
+            url.append(i.get('src'))
+    img_url = [i for i in url if i != 'https://static.zerochan.net/download.png']
+    return random.choice(img_url)
 
 #################################################################################################################################################
 
@@ -688,49 +705,26 @@ async def 幹(ctx):
     
     
 # [指令] 鯊鯊 :
-@bot.command(aliases=['gura','Gura'])
+@bot.command(aliases=['Gura','gura'])
 async def 鯊鯊(ctx):
-    # 取得頁數
-    res = requests.get('https://www.zerochan.net/Gawr+Gura', verify=False)
-    soup = BeautifulSoup(res.text,"html.parser")
-    page_str = soup.find(class_="pagination").find(text=True)
-    page = int(re.search('of ([0-9]*)\t',page_str).group(1))
-
-    # 取得隨機一頁的隨機一張圖片
-    url = []
-    res = requests.get('https://www.zerochan.net/Gawr+Gura?p='+str(random.randint(1,page)), verify=False)
-    soup = BeautifulSoup(res.text,"html.parser")
-    for ele in soup.find_all(id="content"):
-        for i in ele.find_all('img'):
-            url.append(i.get('src'))
-    img_url_list = [i for i in url if i != 'https://static.zerochan.net/download.png']
-    img_url = random.choice(img_url_list)
-            
+    img_url = get_ani_image('Gawr+Gura')
     embed=discord.Embed(title='🦐 Gawr Gura 🦐', color=0x5cb8ff)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
-    
-    
+
 # [指令] 璐娜 :
 @bot.command(aliases=['Luna','luna'])
 async def 璐娜(ctx):
-    # 取得頁數
-    res = requests.get('https://www.zerochan.net/Himemori+Luna', verify=False)
-    soup = BeautifulSoup(res.text,"html.parser")
-    page_str = soup.find(class_="pagination").find(text=True)
-    page = int(re.search('of ([0-9]*)\t',page_str).group(1))
-
-    # 取得隨機一頁的隨機一張圖片
-    url = []
-    res = requests.get('https://www.zerochan.net/Himemori+Luna?p='+str(random.randint(1,page)), verify=False)
-    soup = BeautifulSoup(res.text,"html.parser")
-    for ele in soup.find_all(id="content"):
-        for i in ele.find_all('img'):
-            url.append(i.get('src'))
-    img_url_list = [i for i in url if i != 'https://static.zerochan.net/download.png']
-    img_url = random.choice(img_url_list)
-            
+    img_url = get_ani_image('Himemori+Luna')
     embed=discord.Embed(title='🍬 Himemori Luna 🍬', color=0xffadd1)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)    
+    
+# [指令] 佩克拉 :
+@bot.command(aliases=['Pekora','pekora','Peko'])
+async def 佩克拉(ctx):
+    img_url = get_ani_image('Usada+Pekora')
+    embed=discord.Embed(title='👯 Usada Pekora 👯', color=0xffffff)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
 
@@ -790,7 +784,7 @@ async def YamYA_invite(ctx):
 async def help(ctx):
     embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
     embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
-    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹`", inline=False)
+    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹` \n `Gura/Luna/Peko`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
     embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `笑話` \n `新聞` \n `翻譯 [想翻譯的文字]` \n `呱YA [問題]`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`YamYA_invite` \n `help`", inline=False)
