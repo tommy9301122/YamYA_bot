@@ -157,7 +157,7 @@ async def broadcast():
     utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
     if utc8_time == '0727' and random.randint(1,10) <= 3: # 時間 且機率發生
         channel = bot.get_channel(842463449467453491) # 指定頻道 (zyoi fan club)
-        await channel.send('wysi')
+        await channel.send('早安ヽ(○´∀`)ﾉ')
 
 
 # [自動更新狀態]
