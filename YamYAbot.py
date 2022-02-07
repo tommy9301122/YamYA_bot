@@ -137,8 +137,8 @@ def get_ani_image(search_name):
     soup = BeautifulSoup(res.text,"html.parser")
     page_str = soup.find(class_="pagination").find(text=True)
     page = int(re.search('of ([0-9]*)\t',page_str).group(1))
-    if page>20:
-        page=20
+    if page>10:
+        page=10
     url = []
     res = requests.get('https://www.zerochan.net/'+search_name+'?p='+str(random.randint(1,page)), verify=False)
     soup = BeautifulSoup(res.text,"html.parser")
@@ -199,13 +199,14 @@ async def YamYA_info(ctx):
         guilds = bot.guilds
         all_server_list = [guild.name for guild in guilds]
         member_count_list = [guild.member_count for guild in guilds]
+        server_owner_list = [bot.get_user(int(guild.owner_id)) for guild in guilds]
 
         all_server_count = len(all_server_list)
         all_member_count = sum(member_count_list)
 
         description_main = ''
-        for server_name, member_number in zip(all_server_list, member_count_list):
-            description_main = description_main+server_name+'\n'
+        for server_name, member_number, owner in zip(all_server_list, member_count_list, server_owner_list):
+            description_main = description_main+server_name+'\n--------'+str(member_number)+'人 from: '+f'{owner}'+'\n'
         # 卡片
         embed = discord.Embed(title='YamYA Bot Join Server Info', description=description_main)
         embed.set_footer(text='> 伺服器數量:'+str(all_server_count)+'  總人數:'+str(all_member_count))
@@ -733,6 +734,22 @@ async def 佩克拉(ctx):
 async def 拉米(ctx):
     img_url = get_ani_image('Yukihana+Lamy')
     embed=discord.Embed(title='☃ Yukihana Lamy ☃', color=0x8afdff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+    
+# [指令] 阿夸 :
+@bot.command(aliases=['Aqua','aqua'])
+async def 阿夸(ctx):
+    img_url = get_ani_image('Minato+Aqua')
+    embed=discord.Embed(title='⚓ Minato Aqua ⚓', color=0xffadd1)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+
+# [指令] 詩音 :
+@bot.command(aliases=['Shion','shion'])
+async def 詩音(ctx):
+    img_url = get_ani_image('Murasaki+Shion')
+    embed=discord.Embed(title='🌙 Murasaki Shion 🌙', color=0xc819a8)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
 
