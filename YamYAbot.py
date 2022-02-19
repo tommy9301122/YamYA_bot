@@ -29,6 +29,7 @@ import asyncio
 
 Google_Map_API_key = os.environ.get('Google_Map_API_key')
 Discord_token = os.environ.get('BOT_TOKEN')
+osu_API_key = os.environ.get('osu_API_key')
 
 intents = discord.Intents.default()
 intents.members = True
@@ -528,7 +529,7 @@ async def AMQ(ctx, *args):
 async def 神麻婆(ctx, *args):
     try:
         mapper = ' '.join(args)
-        get_beatmaps = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper).json()
+        get_beatmaps = requests.get('https://osu.ppy.sh/api/get_beatmaps?k='+osu_API_key+'&u='+mapper).json()
         beatmaps = {}
         num = 0
         for i in get_beatmaps:
@@ -559,7 +560,7 @@ async def 神麻婆(ctx, *args):
                                                                     'approved_date':'min', 'submit_date':'min', 'last_update':'min', 
                                                                     'favourite_count':'min', 'playcount':'sum'}).reset_index(drop=False)
             mapper_id = beatmaps[0].get('creator_id')
-            mapper_name = requests.get('https://osu.ppy.sh/api/get_user?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&u='+mapper_id).json()[0].get('username')
+            mapper_name = requests.get('https://osu.ppy.sh/api/get_user?k='+osu_API_key+'&u='+mapper_id).json()[0].get('username')
             # 年齡
             mapping_age = parse_date(datetime.datetime.now() - df_beatmaps.submit_date.min())
             # 做圖數量
@@ -594,7 +595,7 @@ async def icon(ctx, *args):
         try:
             beatmap_url = args[1]
             beatmap_id = re.search(r'beatmapsets\/([0-9]*)', beatmap_url).group(1)
-            beatmap_meta = requests.get('https://osu.ppy.sh/api/get_beatmaps?k=13a36d70fd32e2f87fd2a7a89e4f52d54ab337a1&s='+beatmap_id).json()
+            beatmap_meta = requests.get('https://osu.ppy.sh/api/get_beatmaps?k='+osu_API_key+'&s='+beatmap_id).json()
             beatmap_difficulty_list = [meta.get('version') for meta in beatmap_meta]
             beatmap_rating_list = [float(meta.get('difficultyrating')) for meta in beatmap_meta]
             df_beatmap = pd.DataFrame([beatmap_difficulty_list,beatmap_rating_list]).T.rename(columns={0:'difficulty', 1:'rating'}).sort_values(by='rating', ascending=True)
