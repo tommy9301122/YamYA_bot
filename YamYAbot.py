@@ -330,6 +330,21 @@ async def on_raw_reaction_add(payload):
             rain_hk = str(int((forecast_hk['forecastMaxrh']['value']+forecast_hk['forecastMinrh']['value'])/2))
             weather_embed.add_field(name='香港' ,value='☂'+rain_hk+'%  🌡'+temp_hk+'°C  ⛅'+weat_hk, inline=False)
             await news_message.edit(embed=weather_embed)
+            
+            
+# [指令] 地震 :
+@bot.command()
+async def 地震(ctx, *args):
+    
+    url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=rdec-key-123-45678-011121314'
+    eq_data = requests.get(url).json()
+    eq_content = eq_data['records']['earthquake'][0]['reportContent']
+    eq_image = eq_data['records']['earthquake'][0]['shakemapImageURI']
+    ed_url = eq_data['records']['earthquake'][0]['web']
+    
+    embed=discord.Embed(title=eq_content, url=ed_url, color=0x636363)
+    embed.set_image(url=eq_image)
+    await ctx.send(embed=embed)
 
 
 # [指令] 午/晚餐吃什麼:
