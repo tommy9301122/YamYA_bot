@@ -13,13 +13,14 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```waifu/husbando [AniList account]``` - say random charactor is waifu/husbando from your complete list  
 ```amq [AniList account]``` - play random OP/ED video from your complete/watching list  
 ```cuddle/hug/kiss/feed/nya/poke/baka/fuck``` - random gif  
-```Gura/Luna/Peko``` - randon vtuber image  
+```Gura/Luna/Peko/Lamy/Aqua/Shion``` - randon vtuber image  
 ```hentai/cum``` - NSFW gif (NSFW chennal only)
 
 #### 🍠Others:
 ```午餐吃什麼 [中式/台式/日式/美式] [地區]``` - decide what to eat  
 ```笑話``` - random joke from ptt  
 ```新聞``` - Taiwan News and weather forecast  
+```地震``` - Taiwan latest earthquake records  
 ```translate [text]``` - translate  
 ```呱YA [question]``` - chat with bot    
 ```呱YA``` - easter eggs or something that i want to say  
