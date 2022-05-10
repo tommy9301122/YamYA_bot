@@ -242,26 +242,26 @@ async def 呱YA說(ctx, *, arg):
 
     
 # [指令] 笑話 :
-@bot.command()
-async def 笑話(ctx):
-    ptt = PttJokes(1)
-    joke_class_list = ['笑話','猜謎','耍冷','XD']
-    while True:
-        try:
-            joke_output = ptt.output()
-            if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
-                joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
-
-                joke_title = re.search('.*\\n',joke_output)[0]
-                joke_foot = re.search('\\n.*From ptt',joke_output)[0]
-                joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
-                break
-        except:
-            pass
-
-    embed = discord.Embed(title=joke_title, description=joke_main)
-    embed.set_footer(text=joke_foot)
-    await ctx.send(embed=embed)
+#@bot.command()
+#async def 笑話(ctx):
+#    ptt = PttJokes(1)
+#    joke_class_list = ['笑話','猜謎','耍冷','XD']
+#    while True:
+#        try:
+#            joke_output = ptt.output()
+#            if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
+#                joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
+#
+#                joke_title = re.search('.*\\n',joke_output)[0]
+#                joke_foot = re.search('\\n.*From ptt',joke_output)[0]
+#                joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
+#                break
+#        except:
+#            pass
+#
+#    embed = discord.Embed(title=joke_title, description=joke_main)
+#    embed.set_footer(text=joke_foot)
+#    await ctx.send(embed=embed)
     
     
 # [指令] 新聞 :
