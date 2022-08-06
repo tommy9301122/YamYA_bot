@@ -768,6 +768,23 @@ async def 詩音(ctx):
     embed=discord.Embed(title='🌙 Murasaki Shion 🌙', color=0xc819a8)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
+    
+    
+# [指令] HoneyWorks : 隨機一張HW的圖
+@bot.command(aliases=['HoneyWorks'])
+async def honeyworks(ctx):
+    hw_url = 'https://hanipre.miraheze.org'
+    r = requests.get(hw_url+'/w/index.php?profile=images&search=File%3ASC')
+    soup = BeautifulSoup(r.text, 'lxml')
+    img_source = hw_url + soup.find_all(class_="image")[0].get('href')
+    img_title = re.split('File:SC (.*).png', soup.find_all(class_="searchResultImage")[0].text)[1]
+
+    img_r = requests.get(img_source)
+    img_url = 'https:'+BeautifulSoup(img_r.text, 'lxml').findAll('img')[0]['src']
+    
+    embed=discord.Embed(title=img_title, color=0xf025f4)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
 
 
 #@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
@@ -795,8 +812,9 @@ async def 詩音(ctx):
 @commands.is_nsfw()
 @bot.command(aliases=['cum'])
 async def 射了(ctx):
-    embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
-    embed.set_image(url=nekos.img('cum'))
+    #embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
+    embed=discord.Embed(title="瑟瑟指令維修中", color=0xf1c40f)
+    #embed.set_image(url=nekos.img('cum'))
     await ctx.send(embed=embed)
 
 
@@ -807,14 +825,15 @@ title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','�
 @bot.command(aliases=['hentai'])
 async def 色色(ctx):
     random_gif_nsfw = random.choice(list(zip(gif_class_list_nsfw, title_list_nsfw)))
-    embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
-    embed.set_image(url=nekos.img(random_gif_nsfw[0]))
+    #embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
+    embed=discord.Embed(title="瑟瑟指令維修中", color=0xf1c40f)
+    #embed.set_image(url=nekos.img(random_gif_nsfw[0]))
     await ctx.send(embed=embed)
     
     
 # [指令] YamYA_invite : 邀請碼
-@bot.command()
-async def YamYA_invite(ctx):
+@bot.command(aliases=['YamYA_invite'])
+async def invite(ctx):
     embed=discord.Embed(title="喜歡認識osu麻婆、看動畫、亂道早安晚安的discord機器人", description="👾[GitHub](https://github.com/tommy9301122/YamYA_bot)   🍠[邀請連結](https://discord.com/api/oauth2/authorize?client_id=877426954888962068&permissions=0&scope=bot)", color=0xcc8b00)
     embed.set_author(name="呱YA一號", icon_url="https://cdn.discordapp.com/attachments/378910821234769942/854387552890519552/unknown.png")
     await ctx.send(embed=embed)
@@ -827,8 +846,8 @@ async def help(ctx):
     embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
     embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹` \n `Gura/Luna/Peko/Lamy/Aqua/Shion`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
-    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \ `地震` \n `翻譯 [想翻譯的文字]` \n `呱YA [問題]`", inline=False)
-    embed.add_field(name="⛏機器人相關", value="`YamYA_invite` \n `help`", inline=False)
+    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \n `地震` \n `翻譯 [想翻譯的文字]` \n `呱YA [問題]`", inline=False)
+    embed.add_field(name="⛏機器人相關", value="`invite` \n `help`", inline=False)
     await ctx.send(embed=embed)
 
 
