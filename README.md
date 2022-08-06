@@ -25,7 +25,7 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```呱YA``` - easter eggs or something that i want to say  
 
 #### 🍠bot:
-```YamYA_invite``` - bot invite link  
+```invite``` - bot invite link  
 ```help``` - all command list  
 
 -----------
