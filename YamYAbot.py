@@ -775,12 +775,12 @@ async def 詩音(ctx):
 async def honeyworks(ctx):
     hw_url = 'https://hanipre.miraheze.org'
     r = requests.get(hw_url+'/w/index.php?profile=images&search=File%3ASC')
-    soup = BeautifulSoup(r.text, 'lxml')
+    soup = BeautifulSoup(r.text, 'html.parser')
     img_source = hw_url + soup.find_all(class_="image")[0].get('href')
     img_title = re.split('File:SC (.*).png', soup.find_all(class_="searchResultImage")[0].text)[1]
 
     img_r = requests.get(img_source)
-    img_url = 'https:'+BeautifulSoup(img_r.text, 'lxml').findAll('img')[0]['src']
+    img_url = 'https:'+BeautifulSoup(img_r.text, 'html.parser').findAll('img')[0]['src']
     
     embed=discord.Embed(title=img_title, color=0xf025f4)
     embed.set_image(url=img_url)
