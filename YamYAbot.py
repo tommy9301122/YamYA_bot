@@ -789,7 +789,7 @@ async def honeyworks(ctx):
                 img_title = re.split('File:(.*).png', BeautifulSoup(img_r.text, 'html.parser').findAll(class_="firstHeading mw-first-heading")[0].text)[1]
 
             
-            img_url = 'https:'+BeautifulSoup(img_r.text, 'lxml').findAll('img')[0]['src']
+            img_url = 'https:'+BeautifulSoup(img_r.text, 'html.parser').findAll('img')[0]['src']
             break
         else:
             #重新查詢
