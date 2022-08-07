@@ -14,6 +14,7 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```amq [AniList account]``` - play random OP/ED video from your complete/watching list  
 ```cuddle/hug/kiss/feed/nya/poke/baka/fuck``` - random gif  
 ```Gura/Luna/Peko/Lamy/Aqua/Shion``` - randon vtuber image  
+```honeyworks``` - randon HoneyWorks image  
 ```hentai/cum``` - NSFW gif (NSFW chennal only)
 
 #### 🍠Others:
