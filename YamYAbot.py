@@ -769,6 +769,46 @@ async def 詩音(ctx):
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
     
+# [指令] 拉普拉斯 :
+@bot.command(aliases=['Laplus','laplus','La+','總帥'])
+async def 拉普拉斯(ctx):
+    img_url = get_ani_image('La%2B+Darknesss')
+    embed=discord.Embed(title='🛸 La+ Darknesss 💜', color=0x5cb8ff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+
+# [指令] 博衣 :
+@bot.command(aliases=['博衣小夜璃','小夜璃','Hakui','Koyori'])
+async def 博衣(ctx):
+    img_url = get_ani_image('Hakui+Koyori')
+    embed=discord.Embed(title='🧪 Hakui Koyori 🧪', color=0x5cb8ff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+    
+# [指令] 沙花叉 :
+@bot.command(aliases=['克蘿耶','Sakamata','Chloe','鯨鯊'])
+async def 沙花叉(ctx):
+    img_url = get_ani_image('Sakamata+Chloe')
+    embed=discord.Embed(title='🎣 Sakamata Chloe 🎣', color=0x5cb8ff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+
+# [指令] 風真 :
+@bot.command(aliases=['風真いろは','Kazama','Iroha'])
+async def 風真(ctx):
+    img_url = get_ani_image('Kazama+Iroha')
+    embed=discord.Embed(title='🍃 Kazama Iroha 🍃', color=0x5cb8ff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+    
+# [指令] 鷹嶺 :
+@bot.command(aliases=['鷹嶺ルイ','鷹嶺瑠依'])
+async def 鷹嶺(ctx):
+    img_url = get_ani_image('Takane+Lui')
+    embed=discord.Embed(title='🥀 Takane Lui 🥀', color=0x5cb8ff)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+    
     
 # [指令] HoneyWorks : 隨機一張HW的圖
 @bot.command(aliases=['HoneyWorks'])
@@ -802,25 +842,25 @@ async def honeyworks(ctx):
     await ctx.send(embed=embed)
 
 
-#@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
-#async def 萬聖節快樂(ctx):
-#    # 特效圖
-#    mask = Image.open('halloween_mask.png')#.convert('RGB')
-#    # 大頭貼
-#    url = ctx.author.avatar_url
-#    data = requests.get(url)
-#    im = Image.open(BytesIO(data.content))
-#    # 組合
-#    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
-#    output = output.convert('RGB')
-#    output.paste(mask, (0, 0), mask)
-#    # 存為BytesIO
-#    image_binary = BytesIO() 
-#    output.save(image_binary, 'PNG')
-#    image_binary.seek(0)
-#    # 輸出
-#    await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
-#    await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+@bot.command(aliases=['Halloween','halloween','HappyHalloween'])
+async def 萬聖節快樂(ctx):
+    # 特效圖
+    mask = Image.open('halloween_mask.png')#.convert('RGB')
+    # 大頭貼
+    url = ctx.author.avatar_url
+    data = requests.get(url)
+    im = Image.open(BytesIO(data.content))
+    # 組合
+    output = ImageOps.fit(im, mask.size, centering=(0.5, 0.5))
+    output = output.convert('RGB')
+    output.paste(mask, (0, 0), mask)
+    # 存為BytesIO
+    image_binary = BytesIO() 
+    output.save(image_binary, 'PNG')
+    image_binary.seek(0)
+    # 輸出
+    await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
+    await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
 # [NSFW指令] 射了
@@ -875,7 +915,7 @@ async def on_command_error(ctx, error):
         return
     if isinstance(error, commands.errors.NSFWChannelRequired):
         embed=discord.Embed(title="🔞這個頻道不可以色色!!", color=0xe74c3c)
-        embed.set_image(url='https://imgur.dcard.tw/D7K3R0Rh.jpg')
+        embed.set_image(url='https://tenor.com/view/dog-shiba-inu-gif-25175825')
         return await ctx.send(embed=embed)
     raise error
     
