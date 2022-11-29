@@ -242,26 +242,26 @@ async def 呱YA說(ctx, *, arg):
 
     
 # [指令] 笑話 :
-#@bot.command()
-#async def 笑話(ctx):
-#    ptt = PttJokes(1)
-#    joke_class_list = ['笑話','猜謎','耍冷','XD']
-#    while True:
-#        try:
-#            joke_output = ptt.output()
-#            if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
-#                joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
-#
-#                joke_title = re.search('.*\\n',joke_output)[0]
-#                joke_foot = re.search('\\n.*From ptt',joke_output)[0]
-#                joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
-#                break
-#        except:
-#            pass
-#
-#    embed = discord.Embed(title=joke_title, description=joke_main)
-#    embed.set_footer(text=joke_foot)
-#    await ctx.send(embed=embed)
+@bot.command()
+async def 笑話(ctx):
+    ptt = PttJokes(1)
+    joke_class_list = ['笑話','猜謎','耍冷','XD']
+    while True:
+        try:
+            joke_output = ptt.output()
+            if joke_output[1:3] in joke_class_list and re.search('http',joke_output) is None:
+                joke_output = re.sub('(\\n){4,}','\n\n\n',joke_output)
+
+                joke_title = re.search('.*\\n',joke_output)[0]
+                joke_foot = re.search('\\n.*From ptt',joke_output)[0]
+                joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
+                break
+        except:
+            pass
+
+    embed = discord.Embed(title=joke_title, description=joke_main)
+    embed.set_footer(text=joke_foot)
+    await ctx.send(embed=embed)
     
     
 # [指令] 新聞 :
@@ -877,7 +877,7 @@ async def 射了(ctx):
 gif_class_list_nsfw = ['random_hentai_gif','nsfw_neko_gif','classic', 'bj','pussy','boobs','feetg','solog','pwankg']
 title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','鮑鮑','奶子ლ(́◉◞౪◟◉ლ)','🦵','ꈍ ꈍ','👆🖐🤞💦💦']
 @commands.is_nsfw()
-@bot.command(aliases=['hentai'])
+@bot.command(aliases=['hentai','エロ'])
 async def 色色(ctx):
     random_gif_nsfw = random.choice(list(zip(gif_class_list_nsfw, title_list_nsfw)))
     #embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
@@ -915,7 +915,7 @@ async def on_command_error(ctx, error):
         return
     if isinstance(error, commands.errors.NSFWChannelRequired):
         embed=discord.Embed(title="🔞這個頻道不可以色色!!", color=0xe74c3c)
-        embed.set_image(url='https://tenor.com/view/dog-shiba-inu-gif-25175825')
+        embed.set_image(url='https://cdn.discordapp.com/attachments/848185934187855872/1046623635395313664/d2fc6feb-a48e-4ff6-8cd9-689a0cb43ff5.png')
         return await ctx.send(embed=embed)
     raise error
     
