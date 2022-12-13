@@ -20,6 +20,7 @@ import pandas as pd
 import nekos
 import googlemaps
 from googletrans import Translator
+import openai
 
 import discord
 from discord.ext import commands, tasks
@@ -27,9 +28,10 @@ from discord.ext.commands import CommandNotFound
 import time
 import asyncio
 
-Google_Map_API_key = os.environ.get('Google_Map_API_key')
-Discord_token = os.environ.get('BOT_TOKEN')
-osu_API_key = os.environ.get('osu_API_key')
+Google_Map_API_key = 'Google_Map_API_key'
+Discord_token = 'Discord_token'
+osu_API_key = 'osu_API_key'
+openai.api_key = 'openai_api_key'
 
 intents = discord.Intents.default()
 intents.members = True
@@ -136,8 +138,8 @@ def get_AniList_character(AniList_userName, character_gender_input):
 def get_ani_image(search_name):
     res = requests.get('https://www.zerochan.net/'+search_name, verify=False)
     soup = BeautifulSoup(res.text,"html.parser")
-    page_str = soup.find(class_="pagination").find(text=True)
-    page = int(re.search('of ([0-9]*)\t',page_str).group(1))
+    page_str = soup.find(class_="pagination").find('span').find(text=True)
+    page = int(re.search('of ([0-9]*)',page_str).group(1))
     if page>10:
         page=10
     url = []
@@ -215,7 +217,7 @@ async def YamYA_info(ctx):
     
     
 # [指令] 呱YA : 和呱YA聊天
-@bot.command()
+@bot.command(aliases=['gpt','GPT'])
 async def 呱YA(ctx, *args):
     
     if len(args)==0:
@@ -224,8 +226,17 @@ async def 呱YA(ctx, *args):
     else :
         input_text = ' '.join(args)
         resp = [None]
+        #def get():
+        #    resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
         def get():
-            resp[0] = requests.post('https://asia-east2-bigdata-252110.cloudfunctions.net/ad_w2v_test',json={'input': input_text}).text
+            resp[0] = openai.Completion.create(engine="text-davinci-003",
+                                                prompt=input_text,#.content,
+                                                temperature=0.5,
+                                                max_tokens=1024,
+                                                top_p=1,
+                                                frequency_penalty=0,
+                                                presence_penalty=0,
+                                               )["choices"][0]["text"]
         asyncio.get_event_loop().run_in_executor(None, get)
         while not resp[0]:
             await asyncio.sleep(0.5)
@@ -246,6 +257,7 @@ async def 呱YA說(ctx, *, arg):
 async def 笑話(ctx):
     ptt = PttJokes(1)
     joke_class_list = ['笑話','猜謎','耍冷','XD']
+    error_n=0
     while True:
         try:
             joke_output = ptt.output()
@@ -257,6 +269,10 @@ async def 笑話(ctx):
                 joke_main = joke_output.replace(joke_title,'').replace(joke_foot,'')
                 break
         except:
+            error_n+=1
+            print(error_n)
+            if error_n == 5:
+                break
             pass
 
     embed = discord.Embed(title=joke_title, description=joke_main)
@@ -465,10 +481,11 @@ async def husbando(ctx, *args):
     
     
 # [指令] AMQ : 隨機選一首動畫OP/ED撥放
+'''
 @bot.command(aliases=['amq'])
 async def AMQ(ctx, *args):
     AniList_userName = ' '.join(args)
-    query = '''
+    query = ''
     query ($userName: String, $MediaListStatus: MediaListStatus, $page: Int, $perPage: Int) {
         Page (page: $page, perPage: $perPage) {
             pageInfo {hasNextPage}
@@ -478,7 +495,7 @@ async def AMQ(ctx, *args):
             }
         }
     }
-    '''
+    ''
     # COMPLETED
     page_number = 1
     all_anime_list = []
@@ -537,7 +554,7 @@ async def AMQ(ctx, *args):
             break
         except:
             pass
-
+'''
 
 # [指令] 神麻婆 : 神麻婆卡片
 @bot.command(aliases=['mapper'])
@@ -915,7 +932,7 @@ async def on_command_error(ctx, error):
         return
     if isinstance(error, commands.errors.NSFWChannelRequired):
         embed=discord.Embed(title="🔞這個頻道不可以色色!!", color=0xe74c3c)
-        embed.set_image(url='https://cdn.discordapp.com/attachments/848185934187855872/1046623635395313664/d2fc6feb-a48e-4ff6-8cd9-689a0cb43ff5.png')
+        embed.set_image(url='https://media.discordapp.net/attachments/848185934187855872/1046623635395313664/d2fc6feb-a48e-4ff6-8cd9-689a0cb43ff5.png')
         return await ctx.send(embed=embed)
     raise error
     
