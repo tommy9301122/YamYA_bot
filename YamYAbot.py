@@ -354,9 +354,9 @@ async def 地震(ctx, *args):
     
     url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=rdec-key-123-45678-011121314'
     eq_data = requests.get(url).json()
-    eq_content = eq_data['records']['earthquake'][0]['reportContent']
-    eq_image = eq_data['records']['earthquake'][0]['shakemapImageURI']
-    ed_url = eq_data['records']['earthquake'][0]['web']
+    eq_content = eq_data['records']['Earthquake'][0]['ReportContent']
+    eq_image = eq_data['records']['Earthquake'][0]['ShakemapImageURI']
+    ed_url = eq_data['records']['Earthquake'][0]['Web']
     
     embed=discord.Embed(title=eq_content, url=ed_url, color=0x636363)
     embed.set_image(url=eq_image)
@@ -846,7 +846,7 @@ async def honeyworks(ctx):
                 img_title = re.split('File:(.*).png', BeautifulSoup(img_r.text, 'html.parser').findAll(class_="firstHeading mw-first-heading")[0].text)[1]
 
             
-            img_url = 'https:'+BeautifulSoup(img_r.text, 'html.parser').findAll('img')[0]['src']
+            img_url = 'https:'+BeautifulSoup(img_r.text, 'html.parser').findAll('img')[1]['src']
             break
         else:
             #重新查詢
