@@ -14,6 +14,8 @@ import random
 import requests
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
+import json
+
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -136,19 +138,21 @@ def get_AniList_character(AniList_userName, character_gender_input):
     
 # 取得 zerochan 圖片
 def get_ani_image(search_name):
-    res = requests.get('https://www.zerochan.net/'+search_name, verify=False)
+    res = requests.get('https://www.zerochan.net/'+search_name, headers={"User-Agent":"Defined"}, verify=False)
     soup = BeautifulSoup(res.text,"html.parser")
     page_str = soup.find(class_="pagination").find('span').find(text=True)
     page = int(re.search('of ([0-9]*)',page_str).group(1))
     if page>10:
         page=10
     url = []
-    res = requests.get('https://www.zerochan.net/'+search_name+'?p='+str(random.randint(1,page)), verify=False)
+    res = requests.get('https://www.zerochan.net/'+search_name+'?p='+str(random.randint(1,page)), headers={"User-Agent":"Defined"}, verify=False)
     soup = BeautifulSoup(res.text,"html.parser")
     for ele in soup.find_all(id="content"):
         for i in ele.find_all('img'):
             url.append(i.get('src'))
-    img_url = [i for i in url if i != 'https://static.zerochan.net/download.png']
+    img_url = [i for i in url if i != 'https://static.zerochan.net/download.png'
+                             and i != 'https://s1.zerochan.net/small.png'
+                             and i != 'https://s1.zerochan.net/medium.png']
     return random.choice(img_url)
 
 #################################################################################################################################################
@@ -738,6 +742,14 @@ async def 幹(ctx):
     await ctx.send(embed=embed)
     
     
+# [指令] 小千 :
+@bot.command(aliases=['千醬','Arashi','嵐千砂都'])
+async def 小千(ctx):
+    img_url = get_ani_image('Arashi+Chisato')
+    embed=discord.Embed(title='Arashi Chisato', color=0xff6e90)
+    embed.set_image(url=img_url)
+    await ctx.send(embed=embed)
+    
 # [指令] 鯊鯊 :
 @bot.command(aliases=['Gura','gura'])
 async def 鯊鯊(ctx):
@@ -880,26 +892,16 @@ async def 萬聖節快樂(ctx):
     await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
-# [NSFW指令] 射了
-@commands.is_nsfw()
-@bot.command(aliases=['cum'])
-async def 射了(ctx):
-    #embed=discord.Embed(title="啊...啊嘶....", color=0xf1c40f)
-    embed=discord.Embed(title="瑟瑟指令維修中", color=0xf1c40f)
-    #embed.set_image(url=nekos.img('cum'))
-    await ctx.send(embed=embed)
-
-
 # [NSFW指令] 色色 : 隨機色情GIF
-gif_class_list_nsfw = ['random_hentai_gif','nsfw_neko_gif','classic', 'bj','pussy','boobs','feetg','solog','pwankg']
-title_list_nsfw = ['エッチ!!','%喵','瘋狂做菜','噗..嚕噗...呼...','鮑鮑','奶子ლ(́◉◞౪◟◉ლ)','🦵','ꈍ ꈍ','👆🖐🤞💦💦']
+class_list_nsfw = ['waifu','neko','trap', 'blowjob']
 @commands.is_nsfw()
 @bot.command(aliases=['hentai','エロ'])
 async def 色色(ctx):
-    random_gif_nsfw = random.choice(list(zip(gif_class_list_nsfw, title_list_nsfw)))
-    #embed=discord.Embed(title=random_gif_nsfw[1], color=0xf1c40f)
-    embed=discord.Embed(title="瑟瑟指令維修中", color=0xf1c40f)
-    #embed.set_image(url=nekos.img(random_gif_nsfw[0]))
+    random_nsfw_class = random.choice(class_list_nsfw)
+    nsfw_res = requests.get('https://api.waifu.pics/nsfw/'+random_nsfw_class, headers={"User-Agent":"Defined"}, verify=False)
+    nsfw_pic = json.loads(nsfw_res.text)['url']
+    embed=discord.Embed(color=0xf1c40f)
+    embed.set_image(url=nsfw_pic)
     await ctx.send(embed=embed)
     
     
