@@ -12,13 +12,10 @@
 #### 🍠二次元相關
 ```全婆俠 [AniList帳號]``` - 從你看過的作品中隨機選角喊婆  
 ```waifu/husbando [AniList帳號]``` - 從你看過的作品中隨機選角喊婆/老公(指定性別)  
-```AMQ [AniList帳號]``` - 從你看過或正在看的作品中隨機選一首OP/ED撥放  
-```鯊鯊/璐娜/佩克拉/拉米/阿夸/詩音/拉普拉斯/博衣/沙花叉/風真/鷹嶺``` - vtuber的隨機圖片  
-```honeyworks``` - HoneyWorks的隨機圖片  
 ```貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹``` - 回覆一些有趣的GIF圖  
 
 #### 🍠NSFW (只能於nsfw頻道內使用)
-```射了/色色``` - 色色的GIF圖  
+```色色``` - 色色的GIF圖  
 
 #### 🍠其它
 ```午餐吃什麼 [中式/台式/日式/美式] [地區]``` - 推薦 google maps 4星以上的餐廳，幫助有選擇障礙的人   
@@ -42,11 +39,8 @@
 
 -----------
 ### 相關連結
-* [discord.py](https://discordpy.readthedocs.io/en/stable/)
-* [Heroku](https://www.heroku.com) - bot雲端架設平台  
+* [discord.py](https://discordpy.readthedocs.io/en/stable/)  
 * [osu!api](https://github.com/ppy/osu-api/wiki) - osu!數據來源  
 * [AniList - GraphQL](https://github.com/AniList/ApiV2-GraphQL-Docs) - AniList帳號資料串接  
-* [AnimeThemes](https://github.com/LetrixZ/animethemes-api) - 動畫OP/ED來源  
-* [nekos](https://github.com/Nekos-life/nekos.py) - gif檔來源  
-* [Google Maps](https://github.com/googlemaps/google-maps-services-python)
+* [Google Maps](https://github.com/googlemaps/google-maps-services-python)  
 * [PTT 八卦版問答中文語料](https://github.com/zake7749/Gossiping-Chinese-Corpus) - 問答功能語料來源

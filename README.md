@@ -11,11 +11,8 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 
 #### 🍠ACG:
 ```waifu/husbando [AniList account]``` - say random charactor is waifu/husbando from your complete list  
-```amq [AniList account]``` - play random OP/ED video from your complete/watching list  
 ```cuddle/hug/kiss/feed/nya/poke/baka/fuck``` - random gif  
-```Gura/Luna/Peko/Lamy/Aqua/Shion``` - randon vtuber image  
-```honeyworks``` - random HoneyWorks image  
-```hentai/cum``` - NSFW gif (NSFW chennal only)
+```hentai``` - NSFW gif (NSFW chennal only)
 
 #### 🍠Others:
 ```午餐吃什麼 [中式/台式/日式/美式] [地區]``` - decide what to eat  
@@ -32,11 +29,8 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 
 -----------
 ### Refrence
-* [discord.py](https://discordpy.readthedocs.io/en/stable/)  
-* [Heroku](https://www.heroku.com)  
+* [discord.py](https://discordpy.readthedocs.io/en/stable/)   
 * [osu!api](https://github.com/ppy/osu-api/wiki)  
 * [AniList - GraphQL](https://github.com/AniList/ApiV2-GraphQL-Docs)  
-* [AnimeThemes](https://github.com/LetrixZ/animethemes-api)  
-* [nekos](https://github.com/Nekos-life/nekos.py)  
 * [Google Maps](https://github.com/googlemaps/google-maps-services-python)  
 * [Gossiping-Chinese-Corpus](https://github.com/zake7749/Gossiping-Chinese-Corpus) 

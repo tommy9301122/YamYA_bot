@@ -1,21 +1,21 @@
-from PTT_jokes import PttJokes
-from bot_data import food_a, food_j, food_c, YamYABot_murmur
-import feedparser
-from colour import Color
-from PIL import Image, ImageOps
+import asyncio
+import time
 from io import BytesIO
-import scipy
-import scipy.cluster
 import os
 import datetime
 from datetime import date
 import re
 import random
+import json
 import requests
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
-import json
 
+import feedparser
+from colour import Color
+from PIL import Image, ImageOps
+import scipy
+import scipy.cluster
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
@@ -23,12 +23,12 @@ import nekos
 import googlemaps
 from googletrans import Translator
 import openai
-
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound
-import time
-import asyncio
+
+from PTT_jokes import PttJokes
+from bot_data import food_a, food_j, food_c, YamYABot_murmur
 
 Google_Map_API_key = 'Google_Map_API_key'
 Discord_token = 'Discord_token'
@@ -150,7 +150,7 @@ def get_ani_image(search_name):
     for ele in soup.find_all(id="content"):
         for i in ele.find_all('img'):
             url.append(i.get('src'))
-    img_url = [i for i in url if i != 'https://static.zerochan.net/download.png'
+    img_url = [i for i in url if i != 'https://static.zerochan.net/download.png' 
                              and i != 'https://s1.zerochan.net/small.png'
                              and i != 'https://s1.zerochan.net/medium.png']
     return random.choice(img_url)
@@ -162,8 +162,8 @@ def get_ani_image(search_name):
 async def broadcast():
     # wysi
     utc8_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%H%M")
-    if utc8_time == '0727' and random.randint(1,14) <= 3: # 時間 且機率發生
-        channel = bot.get_channel(842463449467453491) # 指定頻道 (zyoi fan club)
+    if utc8_time == '0727' and random.randint(1,14) <= 3: # 時間且機率發生
+        channel = bot.get_channel(842463449467453491) # 指定頻道
         await channel.send('早安ヽ(○´∀`)ﾉ')
 
 
@@ -179,18 +179,13 @@ async def activity_auto_change():
 @bot.event
 async def on_ready():
     print('目前登入身份：', bot.user)
-    broadcast.start() # 推播
+    #broadcast.start() # 自動推播
     activity_auto_change.start() #自動更新狀態
     
     
 # [新進成員] (依伺服器)
 @bot.event
 async def on_member_join(member):
-    
-    # zyoi fan club
-    if member.guild.id == 842461509477204018:
-        channel = bot.get_channel(842461530066649111)
-        await channel.send(f"{member.mention} hey r u fan of zyoi?🔪")
     
     # 多樂一甲
     if member.guild.id == 885329184166137906:
@@ -221,6 +216,7 @@ async def YamYA_info(ctx):
     
     
 # [指令] 呱YA : 和呱YA聊天
+'''
 @bot.command(aliases=['gpt','GPT'])
 async def 呱YA(ctx, *args):
     
@@ -245,6 +241,7 @@ async def 呱YA(ctx, *args):
         while not resp[0]:
             await asyncio.sleep(0.5)
         await ctx.send(resp[0])
+'''
         
 
 # [指令] 代替呱YA說話
@@ -278,7 +275,6 @@ async def 笑話(ctx):
             if error_n == 5:
                 break
             pass
-
     embed = discord.Embed(title=joke_title, description=joke_main)
     embed.set_footer(text=joke_foot)
     await ctx.send(embed=embed)
@@ -756,15 +752,7 @@ async def 鯊鯊(ctx):
     img_url = get_ani_image('Gawr+Gura')
     embed=discord.Embed(title='🦐 Gawr Gura 🦐', color=0x5cb8ff)
     embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
-
-# [指令] 璐娜 :
-@bot.command(aliases=['Luna','luna'])
-async def 璐娜(ctx):
-    img_url = get_ani_image('Himemori+Luna')
-    embed=discord.Embed(title='🍬 Himemori Luna 🍬', color=0xffadd1)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)    
+    await ctx.send(embed=embed)   
     
 # [指令] 佩克拉 :
 @bot.command(aliases=['Pekora','pekora','Peko'])
@@ -773,73 +761,12 @@ async def 佩克拉(ctx):
     embed=discord.Embed(title='👯 Usada Pekora 👯', color=0xffffff)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
-    
-# [指令] 拉米 :
-@bot.command(aliases=['Lamy','lamy'])
-async def 拉米(ctx):
-    img_url = get_ani_image('Yukihana+Lamy')
-    embed=discord.Embed(title='☃ Yukihana Lamy ☃', color=0x8afdff)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
-    
-# [指令] 阿夸 :
-@bot.command(aliases=['Aqua','aqua'])
-async def 阿夸(ctx):
-    img_url = get_ani_image('Minato+Aqua')
-    embed=discord.Embed(title='⚓ Minato Aqua ⚓', color=0xffadd1)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
 
-# [指令] 詩音 :
-@bot.command(aliases=['Shion','shion'])
-async def 詩音(ctx):
-    img_url = get_ani_image('Murasaki+Shion')
-    embed=discord.Embed(title='🌙 Murasaki Shion 🌙', color=0xc819a8)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
-    
-# [指令] 拉普拉斯 :
-@bot.command(aliases=['Laplus','laplus','La+','總帥'])
-async def 拉普拉斯(ctx):
-    img_url = get_ani_image('La%2B+Darknesss')
-    embed=discord.Embed(title='🛸 La+ Darknesss 💜', color=0x5cb8ff)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
 
-# [指令] 博衣 :
-@bot.command(aliases=['博衣小夜璃','小夜璃','Hakui','Koyori'])
-async def 博衣(ctx):
-    img_url = get_ani_image('Hakui+Koyori')
-    embed=discord.Embed(title='🧪 Hakui Koyori 🧪', color=0x5cb8ff)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
-    
-# [指令] 沙花叉 :
-@bot.command(aliases=['克蘿耶','Sakamata','Chloe','鯨鯊'])
-async def 沙花叉(ctx):
-    img_url = get_ani_image('Sakamata+Chloe')
-    embed=discord.Embed(title='🎣 Sakamata Chloe 🎣', color=0x5cb8ff)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
-
-# [指令] 風真 :
-@bot.command(aliases=['風真いろは','Kazama','Iroha'])
-async def 風真(ctx):
-    img_url = get_ani_image('Kazama+Iroha')
-    embed=discord.Embed(title='🍃 Kazama Iroha 🍃', color=0x5cb8ff)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
-    
-# [指令] 鷹嶺 :
-@bot.command(aliases=['鷹嶺ルイ','鷹嶺瑠依'])
-async def 鷹嶺(ctx):
-    img_url = get_ani_image('Takane+Lui')
-    embed=discord.Embed(title='🥀 Takane Lui 🥀', color=0x5cb8ff)
-    embed.set_image(url=img_url)
-    await ctx.send(embed=embed)
     
     
 # [指令] HoneyWorks : 隨機一張HW的圖
+'''
 @bot.command(aliases=['HoneyWorks'])
 async def honeyworks(ctx):
     hw_search_number = 0
@@ -869,6 +796,7 @@ async def honeyworks(ctx):
     embed=discord.Embed(title=img_title, color=0xf025f4)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
+'''
 
 
 @bot.command(aliases=['Halloween','halloween','HappyHalloween'])
@@ -892,8 +820,8 @@ async def 萬聖節快樂(ctx):
     await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
 
-# [NSFW指令] 色色 : 隨機色情GIF
-class_list_nsfw = ['waifu','neko','trap', 'blowjob']
+# [NSFW指令] 色色
+class_list_nsfw = ['waifu','neko', 'blowjob']
 @commands.is_nsfw()
 @bot.command(aliases=['hentai','エロ'])
 async def 色色(ctx):
@@ -918,8 +846,8 @@ async def invite(ctx):
 async def help(ctx):
     embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
     embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
-    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `貼貼/抱抱/親親/餵我/喵/戳/笨蛋/幹` \n `Gura/Luna/Peko/Lamy/Aqua/Shion` \n `honeyworks`", inline=False)
-    embed.add_field(name="🔞NSFW", value="`色色` \n `射了`", inline=False)
+    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]`", inline=False)
+    embed.add_field(name="🔞NSFW", value="`色色`", inline=False)
     embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \n `地震` \n `翻譯 [想翻譯的文字]` \n `呱YA [問題]`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`invite` \n `help`", inline=False)
     await ctx.send(embed=embed)
