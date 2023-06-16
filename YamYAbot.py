@@ -848,7 +848,7 @@ async def help(ctx):
     embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
     embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色`", inline=False)
-    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \n `地震` \n `翻譯 [想翻譯的文字]` \n `呱YA [問題]`", inline=False)
+    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \n `地震` \n `翻譯 [想翻譯的文字]`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`invite` \n `help`", inline=False)
     await ctx.send(embed=embed)
 

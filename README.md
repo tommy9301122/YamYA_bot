@@ -20,7 +20,6 @@ a discord bot for osu mapper and otaku | [# 中文README](https://github.com/tom
 ```地震``` - Taiwan latest earthquake records  
 ```笑話``` - random joke  
 ```translate [text]``` - translate  
-```呱YA [question]``` - chat with bot  
 ```呱YA``` - easter eggs or something that i want to say  
 
 #### 🍠bot:
