@@ -22,7 +22,7 @@ import pandas as pd
 import nekos
 import googlemaps
 from googletrans import Translator
-import openai
+#import openai
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound
@@ -30,10 +30,12 @@ from discord.ext.commands import CommandNotFound
 from PTT_jokes import PttJokes
 from bot_data import food_a, food_j, food_c, YamYABot_murmur
 
+
+
 Google_Map_API_key = 'Google_Map_API_key'
 Discord_token = 'Discord_token'
 osu_API_key = 'osu_API_key'
-openai.api_key = 'openai_api_key'
+#openai.api_key = 'openai_api_key'
 
 intents = discord.Intents.default()
 intents.members = True
@@ -47,21 +49,43 @@ def googlemaps_search_food(search_food, search_place):
     location_lat = location_info[0].get('geometry').get('location').get('lat')
     location_lng = location_info[0].get('geometry').get('location').get('lng')
     search_place_r = gmaps.places_nearby(keyword=search_food, location=str(location_lat)+', '+str(location_lng), language='zh-TW', radius=1000)
+    
     name_list = []
     place_id_list = []
     rating_list = []
     user_ratings_total_list = []
+    open_now_list = []
+    price_level_list = []
+    
     for i in search_place_r.get('results'):
         name_list.append(i.get('name'))
         place_id_list.append(i.get('place_id'))
         rating_list.append(i.get('rating'))
         user_ratings_total_list.append(i.get('user_ratings_total'))
-    df_result = pd.DataFrame({'name':name_list, 'place_id':place_id_list, 'rating':rating_list, 'user_ratings_total':user_ratings_total_list})
+        open_now = i.get('opening_hours')
+        if open_now != None:
+            open_now = open_now.get('open_now')
+        if open_now == True:
+            open_now='營業中'
+        else:
+            open_now='未營業'
+        open_now_list.append(open_now)
+        price_level_list.append(i.get('price_level'))
+        
+    df_result = pd.DataFrame({'name':name_list, 
+                              'place_id':place_id_list, 
+                              'rating':rating_list, 
+                              'user_ratings_total':user_ratings_total_list,
+                              'open_now':open_now_list,
+                              'price_level':price_level_list
+                             })
+    df_result = df_result.dropna(how='any')
     try:
         df_result = df_result.loc[df_result.rating>4].sample()
     except:
         df_result = df_result.sample()
-    return df_result.name.values[0], df_result.place_id.values[0], df_result.rating.values[0], df_result.user_ratings_total.values[0]
+    
+    return df_result.name.values[0], df_result.place_id.values[0], df_result.rating.values[0], df_result.user_ratings_total.values[0], df_result.open_now.values[0], df_result.price_level.values[0]
 
 # 顏色判斷用
 def get_rating_color(beatmap_rating):
@@ -149,10 +173,11 @@ def get_ani_image(search_name):
     soup = BeautifulSoup(res.text,"html.parser")
     for ele in soup.find_all(id="content"):
         for i in ele.find_all('img'):
-            url.append(i.get('src'))
+            url.append(i.get('data-src'))
     img_url = [i for i in url if i != 'https://static.zerochan.net/download.png' 
                              and i != 'https://s1.zerochan.net/small.png'
-                             and i != 'https://s1.zerochan.net/medium.png']
+                             and i != 'https://s1.zerochan.net/medium.png'
+                             and i != None]
     return random.choice(img_url)
 
 #################################################################################################################################################
@@ -329,7 +354,7 @@ async def on_raw_reaction_add(payload):
 
         elif emoji.name == "🌤":
             # 取得台灣各縣市天氣
-            url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
+            url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=rdec-key-123-45678-011121314'
             r = requests.get(url)
             data = r.json()['records']['locations'][0]['location']
             weather_embed = discord.Embed(title=('天氣預報 '), description=(datetime.datetime.utcnow()+datetime.timedelta(hours=8)).strftime("%Y/%m/%d"), color=0x598ad9)
@@ -352,7 +377,7 @@ async def on_raw_reaction_add(payload):
 @bot.command()
 async def 地震(ctx, *args):
     
-    url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=rdec-key-123-45678-011121314'
+    url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=rdec-key-123-45678-011121314'
     eq_data = requests.get(url).json()
     eq_content = eq_data['records']['Earthquake'][0]['ReportContent']
     eq_image = eq_data['records']['Earthquake'][0]['ShakemapImageURI']
@@ -395,7 +420,9 @@ async def 晚餐吃什麼(ctx, *args):
         search_place = args[0]
         try:
             restaurant = googlemaps_search_food(search_food, search_place)
-            embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
+            embed = discord.Embed(title=restaurant[0], 
+                                  description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3])+'  🕓'+str(restaurant[4])+'  '+'💲'*int(restaurant[5]), 
+                                  url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
             embed.set_author(name = search_food+random.choice(ending_list))
             await ctx.send(embed=embed)
         except:
@@ -412,7 +439,9 @@ async def 晚餐吃什麼(ctx, *args):
             search_food = random.choice(food_a)
         try:
             restaurant = googlemaps_search_food(search_food, search_place)
-            embed = discord.Embed(title=restaurant[0], description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3]), url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
+            embed = discord.Embed(title=restaurant[0], 
+                                  description='⭐'+str(restaurant[2])+'  👄'+str(restaurant[3])+'  🕓'+str(restaurant[4])+'  '+'💲'*int(restaurant[5]), 
+                                  url='https://www.google.com/maps/search/?api=1&query='+search_food+'&query_place_id='+restaurant[1])
             embed.set_author(name = search_food+random.choice(ending_list))
             await ctx.send(embed=embed)
         
@@ -731,11 +760,13 @@ async def 笨蛋(ctx):
     embed=discord.Embed(title="バカ~", color=0xd8d097)
     embed.set_image(url=nekos.img('baka'))
     await ctx.send(embed=embed)
+'''
 @bot.command(aliases=['幹你娘','fuck'])
 async def 幹(ctx):
     embed=discord.Embed(title="-`д´-/", color=0xd8d097)
     embed.set_image(url=nekos.img('slap'))
     await ctx.send(embed=embed)
+'''
     
     
 # [指令] 小千 :
@@ -766,15 +797,14 @@ async def 佩克拉(ctx):
     
     
 # [指令] HoneyWorks : 隨機一張HW的圖
-'''
 @bot.command(aliases=['HoneyWorks'])
 async def honeyworks(ctx):
     hw_search_number = 0
     while True:
         hw_url = 'https://hanipre.miraheze.org'
-        r = requests.get(hw_url+'/w/index.php?profile=images&search=File%3ASC')
+        r = requests.get(hw_url+'/wiki/Special:Search?search=File%3ASC')
         soup = BeautifulSoup(r.text, 'html.parser')
-        img_soup = soup.find_all(class_="image")
+        img_soup = soup.find_all(class_="mw-file-description")
         if len(img_soup)!=0:
             img_source = hw_url + img_soup[0].get('href')
             img_r = requests.get(img_source)
@@ -785,7 +815,7 @@ async def honeyworks(ctx):
                 img_title = re.split('File:(.*).png', BeautifulSoup(img_r.text, 'html.parser').findAll(class_="firstHeading mw-first-heading")[0].text)[1]
 
             
-            img_url = 'https:'+BeautifulSoup(img_r.text, 'html.parser').findAll('img')[1]['src']
+            img_url = 'https:'+BeautifulSoup(img_r.text, 'html.parser').findAll('img')[0]['src']
             break
         else:
             #重新查詢
@@ -796,7 +826,7 @@ async def honeyworks(ctx):
     embed=discord.Embed(title=img_title, color=0xf025f4)
     embed.set_image(url=img_url)
     await ctx.send(embed=embed)
-'''
+
 
 
 @bot.command(aliases=['Halloween','halloween','HappyHalloween'])
@@ -818,6 +848,21 @@ async def 萬聖節快樂(ctx):
     # 輸出
     await ctx.send('🎃 '+ctx.message.author.mention+' Happy Halloween!! 🎃')
     await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+    
+    
+# [指令] 丟掉
+@bot.command()
+async def 丟掉(ctx, *args):
+        
+    if len(args)==0:
+        rd_member = random.choice(ctx.message.guild.members)
+        await ctx.send('<:NMFCworryTrash:930480842361438298> <-'+ctx.message.author.name)
+        await ctx.send('⠀⠀⠀⠀⠀⠀<:NMFCworryback:1173208742851006485> <-'+rd_member.name)
+        
+    else:
+        input_name = ' '.join(args)
+        await ctx.send('<:NMFCworryTrash:930480842361438298> <-'+ctx.message.author.name)
+        await ctx.send('⠀⠀⠀⠀⠀⠀<:NMFCworryback:1173208742851006485> <-'+input_name)
 
 
 # [NSFW指令] 色色
@@ -845,10 +890,10 @@ async def invite(ctx):
 @bot.command(aliases=['YamYA_help'])
 async def help(ctx):
     embed=discord.Embed(title="呱YA一號 指令與功能一覽", url="https://github.com/tommy9301122/YamYA_bot", color=0x5f6791)
-    embed.add_field(name="🎮osu!", value="`神麻婆 [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
-    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]`", inline=False)
+    embed.add_field(name="🎮osu!", value="`mapper [mapper's osu!帳號]` \n `icon bbcode [圖譜url]` \n `combo color [圖譜url]` \n `bg [圖譜url]`", inline=False)
+    embed.add_field(name="📺二次元", value="`全婆俠/waifu/husbando [AniList帳號]` \n `amq [AniList帳號]` \n `honeyworks`", inline=False)
     embed.add_field(name="🔞NSFW", value="`色色`", inline=False)
-    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \n `地震` \n `翻譯 [想翻譯的文字]`", inline=False)
+    embed.add_field(name="🍜其它", value="`午餐/晚餐吃什麼 [中式/台式/日式/美式] [地區]` \n `新聞` \n `地震` \n `翻譯 [想翻譯的文字]` \n `笑話`", inline=False)
     embed.add_field(name="⛏機器人相關", value="`invite` \n `help`", inline=False)
     await ctx.send(embed=embed)
 
